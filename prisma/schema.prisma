@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String @id @default(uuid())
+  githubId  Int    @unique
+  name      String
+  login     String
+  avatarUrl String
+
+ news New[]
+}
+
+model New {
+  id     String @id @default(uuid())
+  userId String
+
+  coverUrl  String
+  content   String
+  title     String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Ministerio {
+  id     String @id @default(uuid())
+  userId String
+
+  name  String
+  title String
+  local String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+}
+
+model Agenda {
+  id     String @id @default(uuid())
+  userId String
+
+  day  String
+  name String
+  hour String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+}
+
+model Agendaaaa {
+  id     String @id @default(uuid())
+  userId String
+
+  day  String
+  name String
+  hour String
+  isPublic  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+}
