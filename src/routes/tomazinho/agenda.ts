@@ -1,17 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
+import { prisma } from '../../lib/prisma'
 
-export async function agendaRoutes(app: FastifyInstance) {
-  app.addHook('preHandler', async (request) => {
-    await request.jwtVerify()
-  })
-
-  app.get('/agenda', async (request) => {
-    const agendas = await prisma.agenda.findMany({
-      where: {
-        userId: request.user.sub,
-      },
+export async function agendaRoutesTomazinho(app: FastifyInstance) {
+  app.get('/agenda/tomazinho', async (request) => {
+    const agendas = await prisma.agendaTomazinho.findMany({
       orderBy: {
         createdAt: 'asc',
       },
@@ -28,14 +21,14 @@ export async function agendaRoutes(app: FastifyInstance) {
     })
   })
 
-  app.get('/agenda/:id', async (request, reply) => {
+  app.get('/agenda/tomazinho/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
 
-    const agenda = await prisma.agenda.findUniqueOrThrow({
+    const agenda = await prisma.agendaTomazinho.findUniqueOrThrow({
       where: {
         id,
       },
@@ -48,7 +41,9 @@ export async function agendaRoutes(app: FastifyInstance) {
     return agenda
   })
 
-  app.post('/agenda', async (request) => {
+  app.post('/agenda/tomazinho', async (request) => {
+    await request.jwtVerify()
+
     const bodySchema = z.object({
       name: z.string(),
       day: z.string(),
@@ -58,7 +53,7 @@ export async function agendaRoutes(app: FastifyInstance) {
 
     const { name, day, isPublic, hour } = bodySchema.parse(request.body)
 
-    const agenda = await prisma.agenda.create({
+    const agenda = await prisma.agendaTomazinho.create({
       data: {
         name,
         day,
@@ -71,7 +66,9 @@ export async function agendaRoutes(app: FastifyInstance) {
     return agenda
   })
 
-  app.put('/agenda/:id', async (request, reply) => {
+  app.put('/agenda/tomazinho/:id', async (request, reply) => {
+    await request.jwtVerify()
+
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -87,7 +84,7 @@ export async function agendaRoutes(app: FastifyInstance) {
 
     const { name, day, isPublic, hour } = bodySchema.parse(request.body)
 
-    let agenda = await prisma.agenda.findUniqueOrThrow({
+    let agenda = await prisma.agendaTomazinho.findUniqueOrThrow({
       where: {
         id,
       },
@@ -97,7 +94,7 @@ export async function agendaRoutes(app: FastifyInstance) {
       return reply.status(401).send()
     }
 
-    agenda = await prisma.agenda.update({
+    agenda = await prisma.agendaTomazinho.update({
       where: {
         id,
       },
@@ -112,14 +109,16 @@ export async function agendaRoutes(app: FastifyInstance) {
     return agenda
   })
 
-  app.delete('/agenda/:id', async (request, reply) => {
+  app.delete('/agenda/tomazinho/:id', async (request, reply) => {
+    await request.jwtVerify()
+
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
 
-    const agenda = await prisma.agenda.findUniqueOrThrow({
+    const agenda = await prisma.agendaTomazinho.findUniqueOrThrow({
       where: {
         id,
       },
@@ -129,7 +128,7 @@ export async function agendaRoutes(app: FastifyInstance) {
       return reply.status(401).send()
     }
 
-    await prisma.agenda.delete({
+    await prisma.agendaTomazinho.delete({
       where: {
         id,
       },

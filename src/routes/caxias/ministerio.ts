@@ -1,17 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
+import { prisma } from '../../lib/prisma'
 
-export async function ministerioRoutes(app: FastifyInstance) {
-  app.addHook('preHandler', async (request) => {
-    await request.jwtVerify()
-  })
-
-  app.get('/ministerio', async (request) => {
-    const ministerios = await prisma.ministerio.findMany({
-      where: {
-        userId: request.user.sub,
-      },
+export async function ministerioRoutesCaxias(app: FastifyInstance) {
+  app.get('/ministerio/caxias', async (request) => {
+    const ministerios = await prisma.ministerioCaxias.findMany({
       orderBy: {
         createdAt: 'asc',
       },
@@ -28,14 +21,14 @@ export async function ministerioRoutes(app: FastifyInstance) {
     })
   })
 
-  app.get('/minsterio/:id', async (request, reply) => {
+  app.get('/minsterio/caxias/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
 
-    const ministerio = await prisma.ministerio.findUniqueOrThrow({
+    const ministerio = await prisma.ministerioCaxias.findUniqueOrThrow({
       where: {
         id,
       },
@@ -48,7 +41,9 @@ export async function ministerioRoutes(app: FastifyInstance) {
     return ministerio
   })
 
-  app.post('/ministerio', async (request) => {
+  app.post('/ministerio/caxias', async (request) => {
+    await request.jwtVerify()
+
     const bodySchema = z.object({
       name: z.string(),
       title: z.string(),
@@ -58,7 +53,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
 
     const { name, title, isPublic, local } = bodySchema.parse(request.body)
 
-    const ministerio = await prisma.ministerio.create({
+    const ministerio = await prisma.ministerioCaxias.create({
       data: {
         name,
         title,
@@ -71,7 +66,9 @@ export async function ministerioRoutes(app: FastifyInstance) {
     return ministerio
   })
 
-  app.put('/ministerio/:id', async (request, reply) => {
+  app.put('/ministerio/caxias/:id', async (request, reply) => {
+    await request.jwtVerify()
+
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -87,7 +84,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
 
     const { name, title, isPublic, local } = bodySchema.parse(request.body)
 
-    let ministerio = await prisma.ministerio.findUniqueOrThrow({
+    let ministerio = await prisma.ministerioCaxias.findUniqueOrThrow({
       where: {
         id,
       },
@@ -97,7 +94,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
       return reply.status(401).send()
     }
 
-    ministerio = await prisma.ministerio.update({
+    ministerio = await prisma.ministerioCaxias.update({
       where: {
         id,
       },
@@ -112,14 +109,16 @@ export async function ministerioRoutes(app: FastifyInstance) {
     return ministerio
   })
 
-  app.delete('/ministerio/:id', async (request, reply) => {
+  app.delete('/ministerio/caxias/:id', async (request, reply) => {
+    await request.jwtVerify()
+
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
 
-    const ministerio = await prisma.ministerio.findUniqueOrThrow({
+    const ministerio = await prisma.ministerioCaxias.findUniqueOrThrow({
       where: {
         id,
       },
@@ -129,7 +128,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
       return reply.status(401).send()
     }
 
-    await prisma.ministerio.delete({
+    await prisma.ministerioCaxias.delete({
       where: {
         id,
       },

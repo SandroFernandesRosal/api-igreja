@@ -1,17 +1,10 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
+import { prisma } from '../../lib/prisma'
 
 export async function memoriesRoutes(app: FastifyInstance) {
-  app.addHook('preHandler', async (request) => {
-    await request.jwtVerify()
-  })
-
-  app.get('/news', async (request) => {
+  app.get('/news/vp', async (request) => {
     const memories = await prisma.new.findMany({
-      where: {
-        userId: request.user.sub,
-      },
       orderBy: {
         createdAt: 'asc',
       },
@@ -25,11 +18,12 @@ export async function memoriesRoutes(app: FastifyInstance) {
         content: memory.content,
         excerpt: memory.content.substring(0, 115).concat('...'),
         createdAt: memory.createdAt,
+        page: memory.page,
       }
     })
   })
 
-  app.get('/news/:id', async (request, reply) => {
+  app.get('/news/vp/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -49,15 +43,18 @@ export async function memoriesRoutes(app: FastifyInstance) {
     return memory
   })
 
-  app.post('/news', async (request) => {
+  app.post('/news/vp', async (request) => {
+    await request.jwtVerify()
+
     const bodySchema = z.object({
       content: z.string(),
       coverUrl: z.string(),
       title: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      page: z.string(),
     })
 
-    const { content, coverUrl, isPublic, title } = bodySchema.parse(
+    const { content, coverUrl, isPublic, title, page } = bodySchema.parse(
       request.body,
     )
 
@@ -68,13 +65,16 @@ export async function memoriesRoutes(app: FastifyInstance) {
         title,
         isPublic,
         userId: request.user.sub,
+        page,
       },
     })
 
     return memory
   })
 
-  app.put('/news/:id', async (request, reply) => {
+  app.put('/news/vp/:id', async (request, reply) => {
+    await request.jwtVerify()
+
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -86,9 +86,10 @@ export async function memoriesRoutes(app: FastifyInstance) {
       coverUrl: z.string(),
       title: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      page: z.string(),
     })
 
-    const { content, coverUrl, isPublic, title } = bodySchema.parse(
+    const { content, coverUrl, isPublic, title, page } = bodySchema.parse(
       request.body,
     )
 
@@ -111,13 +112,16 @@ export async function memoriesRoutes(app: FastifyInstance) {
         coverUrl,
         title,
         isPublic,
+        page,
       },
     })
 
     return memory
   })
 
-  app.delete('/news/:id', async (request, reply) => {
+  app.delete('/news/vp/:id', async (request, reply) => {
+    await request.jwtVerify()
+
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
