@@ -9,10 +9,10 @@ datasource db {
 
 model User {
   id        String @id @default(uuid())
-  githubId  Int    @unique
+  login     String   @unique
   name      String
-  login     String
   avatarUrl String
+  password  String
 
  news New[]  
  newstomazinho NewTomazinho[]
@@ -22,11 +22,9 @@ model User {
 model New {
   id     String @id @default(uuid())
   userId String
-
   coverUrl  String
   content   String
   title     String
-  isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   page String
 

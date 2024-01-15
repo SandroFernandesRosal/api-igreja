@@ -1,78 +1,111 @@
 import { FastifyInstance } from 'fastify'
-import axios from 'axios'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
+import bcrypt from 'bcryptjs'
 
 export async function authRoutes(app: FastifyInstance) {
   app.post('/register', async (request) => {
-    const bodySchema = z.object({
-      code: z.string(),
-    })
-
-    const { code } = bodySchema.parse(request.body)
-
-    const accessTokenResponse = await axios.post(
-      'https://github.com/login/oauth/access_token',
-      null,
-      {
-        params: {
-          client_id: process.env.GITHUB_CLIENT_ID,
-          client_secret: process.env.GITHUB_CLIENT_SECRET,
-          code,
-        },
-        headers: {
-          Accept: 'application/json',
-        },
-      },
-    )
-
-    const { access_token } = accessTokenResponse.data
-
-    const userResponse = await axios.get('https://api.github.com/user', {
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-      },
-    })
-
     const userSchema = z.object({
-      id: z.number(),
       login: z.string(),
       name: z.string(),
-      avatar_url: z.string().url(),
+      avatarUrl: z.string().url(),
+      password: z.string(),
     })
+    try {
+      const { login, name, avatarUrl, password } = userSchema.parse(
+        request.body,
+      )
+      const senhaCriptografada = await bcrypt.hash(password, 10)
 
-    const userInfo = userSchema.parse(userResponse.data)
-
-    let user = await prisma.user.findUnique({
-      where: {
-        githubId: userInfo.id,
-      },
-    })
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          githubId: userInfo.id,
-          login: userInfo.login,
-          name: userInfo.name,
-          avatarUrl: userInfo.avatar_url,
+      const existingUser = await prisma.user.findUnique({
+        where: {
+          login,
         },
       })
-    }
 
-    const token = app.jwt.sign(
-      {
-        name: user.name,
-        avatarUrl: user.avatarUrl,
-      },
-      {
-        sub: user.id,
-        expiresIn: '30 days',
-      },
-    )
+      if (!bcrypt.compare(password, senhaCriptografada)) {
+        return {
+          error: `Senha incorreta.`,
+        }
+      }
 
-    return {
-      token,
+      if (!existingUser) {
+        const user = await prisma.user.create({
+          data: {
+            login,
+            name,
+            avatarUrl,
+            password: senhaCriptografada,
+          },
+        })
+
+        const token = app.jwt.sign(
+          {
+            name: user.name,
+            avatarUrl: user.avatarUrl,
+            login: user.login,
+          },
+          {
+            sub: user.id,
+            expiresIn: '30 days',
+          },
+        )
+        return { token }
+      } else {
+        return { error: 'usuário já existe' }
+      }
+    } catch (error) {
+      console.error(error)
+      return { error: 'Erro ao criar usuário' }
     }
+  })
+
+  app.put('/register/:id', async (request, reply) => {
+    await request.jwtVerify()
+
+    const paramsSchema = z.object({
+      id: z.string().uuid(),
+    })
+
+    const { id } = paramsSchema.parse(request.params)
+
+    const bodySchema = z.object({
+      name: z.string(),
+
+      avatarUrl: z.string(),
+      password: z.string(),
+    })
+
+    const { name, avatarUrl, password } = bodySchema.parse(request.body)
+
+    const user = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+
+        avatarUrl,
+        password,
+      },
+    })
+
+    return user
+  })
+
+  app.delete('/register/:id', async (request, reply) => {
+    await request.jwtVerify()
+
+    const paramsSchema = z.object({
+      id: z.string().uuid(),
+    })
+
+    const { id } = paramsSchema.parse(request.params)
+
+    await prisma.user.delete({
+      where: {
+        id,
+      },
+    })
   })
 }
