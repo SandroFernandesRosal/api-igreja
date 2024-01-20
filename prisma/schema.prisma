@@ -9,24 +9,25 @@ datasource db {
 
 model User {
   id        String @id @default(uuid())
-  login     String   @unique
+  login     String @unique
   name      String
   avatarUrl String
   password  String
 
- news New[]  
- newstomazinho NewTomazinho[]
- newscaxias NewCaxias[]
+  news          New[]
+  newstomazinho NewTomazinho[]
+  newscaxias    NewCaxias[]
 }
 
 model New {
-  id     String @id @default(uuid())
-  userId String
+  id        String   @id @default(uuid())
+  userId    String
   coverUrl  String
   content   String
   title     String
   createdAt DateTime @default(now())
-  page String
+  isPublic  Boolean  @default(true)
+  page      String
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -35,26 +36,24 @@ model Ministerio {
   id     String @id @default(uuid())
   userId String
 
-  name  String
-  title String
-  local String
+  name      String
+  title     String
+  local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  
+  coverUrl String
 }
 
 model Agenda {
   id     String @id @default(uuid())
   userId String
 
-  day  String
-  name String
-  hour String
+  day       String
+  name      String
+  hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-
 }
-
 
 model NewTomazinho {
   id     String @id @default(uuid())
@@ -65,7 +64,7 @@ model NewTomazinho {
   title     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  page String
+  page      String
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -74,26 +73,24 @@ model MinisterioTomazinho {
   id     String @id @default(uuid())
   userId String
 
-  name  String
-  title String
-  local String
+  name      String
+  title     String
+  local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  
+  coverUrl String
 }
 
 model AgendaTomazinho {
   id     String @id @default(uuid())
   userId String
 
-  day  String
-  name String
-  hour String
+  day       String
+  name      String
+  hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-
 }
-
 
 model NewCaxias {
   id     String @id @default(uuid())
@@ -104,7 +101,7 @@ model NewCaxias {
   title     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  page String
+  page      String
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -113,22 +110,21 @@ model MinisterioCaxias {
   id     String @id @default(uuid())
   userId String
 
-  name  String
-  title String
-  local String
+  name      String
+  title     String
+  local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  
+  coverUrl String
 }
 
 model AgendaCaxias {
   id     String @id @default(uuid())
   userId String
 
-  day  String
-  name String
-  hour String
+  day       String
+  name      String
+  hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-
 }

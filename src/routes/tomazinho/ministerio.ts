@@ -17,6 +17,7 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
         title: ministerio.title,
         local: ministerio.local,
         createdAt: ministerio.createdAt,
+        coverUrl: ministerio.coverUrl,
       }
     })
   })
@@ -49,9 +50,12 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
       title: z.string(),
       local: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      coverUrl: z.string(),
     })
 
-    const { name, title, isPublic, local } = bodySchema.parse(request.body)
+    const { name, title, isPublic, local, coverUrl } = bodySchema.parse(
+      request.body,
+    )
 
     const ministerio = await prisma.ministerioTomazinho.create({
       data: {
@@ -60,6 +64,7 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
         local,
         isPublic,
         userId: request.user.sub,
+        coverUrl,
       },
     })
 
@@ -80,9 +85,12 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
       title: z.string(),
       local: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      coverUrl: z.string(),
     })
 
-    const { name, title, isPublic, local } = bodySchema.parse(request.body)
+    const { name, title, isPublic, local, coverUrl } = bodySchema.parse(
+      request.body,
+    )
 
     let ministerio = await prisma.ministerioTomazinho.findUniqueOrThrow({
       where: {
@@ -103,6 +111,7 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
         title,
         local,
         isPublic,
+        coverUrl,
       },
     })
 
