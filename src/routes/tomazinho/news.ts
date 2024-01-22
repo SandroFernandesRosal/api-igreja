@@ -43,6 +43,41 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
     return memory
   })
 
+  app.get('/news/tomazinho/search', async (request) => {
+    const paramsSchema = z.object({
+      search: z.string(),
+    })
+
+    try {
+      const { search } = paramsSchema.parse(request.query)
+
+      if (!search) {
+        throw new Error('Query parameter is missing')
+      }
+
+      const memories = await prisma.newTomazinho.findMany({
+        where: {
+          OR: [{ title: { contains: search } }],
+        },
+      })
+
+      return memories.map((memory) => {
+        return {
+          id: memory.id,
+          coverUrl: memory.coverUrl,
+          title: memory.title,
+          content: memory.content,
+          excerpt: memory.content.substring(0, 115).concat('...'),
+          createdAt: memory.createdAt,
+          page: memory.page,
+        }
+      })
+    } catch (error) {
+      // Trate o erro de maneira apropriada, como retornar um código de erro HTTP 500
+      return { error: 'Internal Server Error' }
+    }
+  })
+
   app.post('/news/tomazinho', async (request) => {
     await request.jwtVerify()
 
