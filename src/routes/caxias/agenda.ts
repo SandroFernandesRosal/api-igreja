@@ -6,7 +6,7 @@ export async function agendaRoutesCaxias(app: FastifyInstance) {
   app.get('/agenda/caxias', async (request) => {
     const agendas = await prisma.agendaCaxias.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
@@ -90,10 +90,6 @@ export async function agendaRoutesCaxias(app: FastifyInstance) {
       },
     })
 
-    if (agenda.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
-
     agenda = await prisma.agendaCaxias.update({
       where: {
         id,
@@ -118,15 +114,11 @@ export async function agendaRoutesCaxias(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const agenda = await prisma.agendaCaxias.findUniqueOrThrow({
+    await prisma.agendaCaxias.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (agenda.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     await prisma.agendaCaxias.delete({
       where: {

@@ -6,7 +6,7 @@ export async function ministerioRoutesCaxias(app: FastifyInstance) {
   app.get('/ministerio/caxias', async (request) => {
     const ministerios = await prisma.ministerioCaxias.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
@@ -98,10 +98,6 @@ export async function ministerioRoutesCaxias(app: FastifyInstance) {
       },
     })
 
-    if (ministerio.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
-
     ministerio = await prisma.ministerioCaxias.update({
       where: {
         id,
@@ -127,15 +123,11 @@ export async function ministerioRoutesCaxias(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const ministerio = await prisma.ministerioCaxias.findUniqueOrThrow({
+    await prisma.ministerioCaxias.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (ministerio.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     await prisma.ministerioCaxias.delete({
       where: {

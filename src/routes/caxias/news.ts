@@ -6,7 +6,7 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
   app.get('/news/caxias', async (request) => {
     const memories = await prisma.newCaxias.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
@@ -134,10 +134,6 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
       },
     })
 
-    if (memory.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
-
     memory = await prisma.newCaxias.update({
       where: {
         id,
@@ -163,15 +159,11 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const memory = await prisma.newCaxias.findUniqueOrThrow({
+    await prisma.newCaxias.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (memory.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     await prisma.newCaxias.delete({
       where: {

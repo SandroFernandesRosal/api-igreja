@@ -6,7 +6,7 @@ export async function agendaRoutes(app: FastifyInstance) {
   app.get('/agenda/vp', async (request) => {
     const agendas = await prisma.agenda.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
@@ -90,10 +90,6 @@ export async function agendaRoutes(app: FastifyInstance) {
       },
     })
 
-    if (agenda.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
-
     agenda = await prisma.agenda.update({
       where: {
         id,
@@ -118,15 +114,11 @@ export async function agendaRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const agenda = await prisma.agenda.findUniqueOrThrow({
+    await prisma.agenda.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (agenda.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     await prisma.agenda.delete({
       where: {

@@ -6,7 +6,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
   app.get('/news/vp', async (request) => {
     const memories = await prisma.new.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
@@ -134,10 +134,6 @@ export async function memoriesRoutes(app: FastifyInstance) {
       },
     })
 
-    if (memory.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
-
     memory = await prisma.new.update({
       where: {
         id,
@@ -163,15 +159,11 @@ export async function memoriesRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const memory = await prisma.new.findUniqueOrThrow({
+    await prisma.new.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (memory.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     await prisma.new.delete({
       where: {

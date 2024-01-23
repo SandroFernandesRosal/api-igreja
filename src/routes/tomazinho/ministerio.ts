@@ -6,7 +6,7 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
   app.get('/ministerio/tomazinho', async (request) => {
     const ministerios = await prisma.ministerioTomazinho.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
@@ -98,10 +98,6 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
       },
     })
 
-    if (ministerio.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
-
     ministerio = await prisma.ministerioTomazinho.update({
       where: {
         id,
@@ -127,15 +123,11 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const ministerio = await prisma.ministerioTomazinho.findUniqueOrThrow({
+    await prisma.ministerioTomazinho.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (ministerio.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     await prisma.ministerioTomazinho.delete({
       where: {

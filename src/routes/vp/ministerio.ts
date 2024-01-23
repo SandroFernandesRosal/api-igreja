@@ -6,7 +6,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
   app.get('/ministerio/vp', async (request) => {
     const ministerios = await prisma.ministerio.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
@@ -53,7 +53,9 @@ export async function ministerioRoutes(app: FastifyInstance) {
       coverUrl: z.string(),
     })
 
-    const { name, title, isPublic, local, coverUrl } = bodySchema.parse(request.body)
+    const { name, title, isPublic, local, coverUrl } = bodySchema.parse(
+      request.body,
+    )
 
     const ministerio = await prisma.ministerio.create({
       data: {
@@ -86,17 +88,15 @@ export async function ministerioRoutes(app: FastifyInstance) {
       coverUrl: z.string(),
     })
 
-    const { name, title, isPublic, local, coverUrl } = bodySchema.parse(request.body)
+    const { name, title, isPublic, local, coverUrl } = bodySchema.parse(
+      request.body,
+    )
 
     let ministerio = await prisma.ministerio.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (ministerio.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     ministerio = await prisma.ministerio.update({
       where: {
@@ -123,15 +123,11 @@ export async function ministerioRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const ministerio = await prisma.ministerio.findUniqueOrThrow({
+    await prisma.ministerio.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (ministerio.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     await prisma.ministerio.delete({
       where: {

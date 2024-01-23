@@ -6,7 +6,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
   app.get('/news/tomazinho', async (request) => {
     const memories = await prisma.newTomazinho.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
@@ -134,10 +134,6 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
       },
     })
 
-    if (memory.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
-
     memory = await prisma.newTomazinho.update({
       where: {
         id,
@@ -163,15 +159,11 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const memory = await prisma.newTomazinho.findUniqueOrThrow({
+    await prisma.newTomazinho.findUniqueOrThrow({
       where: {
         id,
       },
     })
-
-    if (memory.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     await prisma.newTomazinho.delete({
       where: {
