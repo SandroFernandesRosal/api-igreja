@@ -16,7 +16,6 @@ import { memoriesRoutesCaxias } from './routes/caxias/news'
 import { agendaRoutesTomazinho } from './routes/tomazinho/agenda'
 import { ministerioRoutesTomazinho } from './routes/tomazinho/ministerio'
 import { memoriesRoutesTomazinho } from './routes/tomazinho/news'
-import { prisma } from './lib/prisma'
 
 const app = fastify()
 
@@ -33,12 +32,6 @@ app.register(cors, {
 
 app.register(jwt, {
   secret: 'alcancadospelagraca',
-})
-
-app.get('/users', async () => {
-  const users = await prisma.user.findMany()
-
-  return users
 })
 
 app.register(authRoutes)

@@ -4,6 +4,88 @@ import { prisma } from '../lib/prisma'
 import bcrypt from 'bcryptjs'
 
 export async function authRoutes(app: FastifyInstance) {
+  app.get('/register', async (request) => {
+    const users = await prisma.user.findMany()
+
+    return users.map((user) => {
+      return {
+        id: user.id,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        login: user.login,
+        password: user.password,
+      }
+    })
+  })
+
+  app.get('/register/:id', async (request) => {
+    const paramsSchema = z.object({
+      id: z.string().uuid(),
+    })
+
+    const { id } = paramsSchema.parse(request.params)
+
+    const user = await prisma.user.findUniqueOrThrow({
+      where: {
+        id,
+      },
+    })
+
+    return user
+  })
+
+  app.post('/login', async (request) => {
+    const userSchema = z.object({
+      login: z.string(),
+      password: z.string(),
+    })
+
+    try {
+      const { login, password } = userSchema.parse(request.body)
+
+      const user = await authenticateUser(login, password)
+
+      if (!user) {
+        return { error: 'Credenciais inválidas.' }
+      }
+
+      const token = app.jwt.sign(
+        {
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+          login: user.login,
+        },
+        {
+          sub: user.id,
+          expiresIn: '30 days',
+        },
+      )
+
+      return { user, token }
+    } catch (error) {
+      console.error(error)
+      return { error: 'Erro na autenticação' }
+    }
+  })
+
+  // ... outras rotas ...
+
+  async function authenticateUser(login: string, password: any) {
+    const user = await prisma.user.findUnique({
+      where: {
+        login,
+      },
+    })
+
+    if (!user) {
+      return false
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+
+    return isPasswordValid ? user : false
+  }
+
   app.post('/register', async (request) => {
     const userSchema = z.object({
       login: z.string(),
@@ -44,15 +126,17 @@ export async function authRoutes(app: FastifyInstance) {
             name: user.name,
             avatarUrl: user.avatarUrl,
             login: user.login,
+            password: user.password,
           },
           {
             sub: user.id,
             expiresIn: '30 days',
           },
         )
-        return { token }
+
+        return { user, token }
       } else {
-        return { error: 'usuário já existe' }
+        return { error: `Usuário ${login} já existe.` }
       }
     } catch (error) {
       console.error(error)
