@@ -68,8 +68,6 @@ export async function authRoutes(app: FastifyInstance) {
     }
   })
 
-  // ... outras rotas ...
-
   async function authenticateUser(login: string, password: any) {
     const user = await prisma.user.findUnique({
       where: {
