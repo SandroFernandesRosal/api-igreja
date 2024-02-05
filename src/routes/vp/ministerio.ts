@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { prisma } from '../../lib/prisma'
 
 export async function ministerioRoutes(app: FastifyInstance) {
-  app.get('/ministerio/vp', async (request) => {
+  app.get('/ministerio/viladapenha', async (request) => {
     const ministerios = await prisma.ministerio.findMany({
       orderBy: {
         createdAt: 'desc',
@@ -22,7 +22,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
     })
   })
 
-  app.get('/minsterio/vp/:id', async (request, reply) => {
+  app.get('/minsterio/viladapenha/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -42,7 +42,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
     return ministerio
   })
 
-  app.post('/ministerio/vp', async (request) => {
+  app.post('/ministerio/viladapenha', async (request) => {
     await request.jwtVerify()
 
     const bodySchema = z.object({
@@ -71,7 +71,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
     return ministerio
   })
 
-  app.put('/ministerio/vp/:id', async (request, reply) => {
+  app.put('/ministerio/viladapenha/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
@@ -114,7 +114,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
     return ministerio
   })
 
-  app.delete('/ministerio/vp/:id', async (request, reply) => {
+  app.delete('/ministerio/viladapenha/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({

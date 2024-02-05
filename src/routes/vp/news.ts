@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { prisma } from '../../lib/prisma'
 
 export async function memoriesRoutes(app: FastifyInstance) {
-  app.get('/news/vp', async (request) => {
+  app.get('/news/viladapenha', async (request) => {
     const memories = await prisma.new.findMany({
       orderBy: {
         createdAt: 'desc',
@@ -23,7 +23,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
     })
   })
 
-  app.get('/news/vp/:id', async (request, reply) => {
+  app.get('/news/viladapenha/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -43,7 +43,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
     return memory
   })
 
-  app.get('/news/vp/search', async (request) => {
+  app.get('/news/viladapenha/search', async (request) => {
     const paramsSchema = z.object({
       search: z.string(),
     })
@@ -78,7 +78,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
     }
   })
 
-  app.post('/news/vp', async (request) => {
+  app.post('/news/viladapenha', async (request) => {
     await request.jwtVerify()
 
     const bodySchema = z.object({
@@ -107,7 +107,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
     return memory
   })
 
-  app.put('/news/vp/:id', async (request, reply) => {
+  app.put('/news/viladapenha/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
@@ -150,7 +150,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
     return memory
   })
 
-  app.delete('/news/vp/:id', async (request, reply) => {
+  app.delete('/news/viladapenha/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({

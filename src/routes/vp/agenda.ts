@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { prisma } from '../../lib/prisma'
 
 export async function agendaRoutes(app: FastifyInstance) {
-  app.get('/agenda/vp', async (request) => {
+  app.get('/agenda/viladapenha', async (request) => {
     const agendas = await prisma.agenda.findMany({
       orderBy: {
         createdAt: 'desc',
@@ -21,7 +21,7 @@ export async function agendaRoutes(app: FastifyInstance) {
     })
   })
 
-  app.get('/agenda/vp/:id', async (request, reply) => {
+  app.get('/agenda/viladapenha/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -41,7 +41,7 @@ export async function agendaRoutes(app: FastifyInstance) {
     return agenda
   })
 
-  app.post('/agenda/vp', async (request) => {
+  app.post('/agenda/viladapenha', async (request) => {
     await request.jwtVerify()
 
     const bodySchema = z.object({
@@ -66,7 +66,7 @@ export async function agendaRoutes(app: FastifyInstance) {
     return agenda
   })
 
-  app.put('/agenda/vp/:id', async (request, reply) => {
+  app.put('/agenda/viladapenha/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
@@ -105,7 +105,7 @@ export async function agendaRoutes(app: FastifyInstance) {
     return agenda
   })
 
-  app.delete('/agenda/vp/:id', async (request, reply) => {
+  app.delete('/agenda/viladapenha/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
