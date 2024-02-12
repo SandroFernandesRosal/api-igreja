@@ -15,8 +15,20 @@ model User {
   password  String
 
   news          New[]
+  ministerio Ministerio[]
+  agenda Agenda[]
+
   newstomazinho NewTomazinho[]
+  ministeriotomazinho MinisterioTomazinho[]
+  agendatomazinho AgendaTomazinho[]
+
   newscaxias    NewCaxias[]
+  ministeriocaxias MinisterioCaxias[]
+  agendacaxias AgendaCaxias[]
+
+  doacao Doacao[]
+  endereco Endereco[]
+  contato Contato[]
 }
 
 model New {
@@ -42,6 +54,8 @@ model Ministerio {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   coverUrl String
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model Agenda {
@@ -53,6 +67,8 @@ model Agenda {
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model NewTomazinho {
@@ -79,6 +95,8 @@ model MinisterioTomazinho {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   coverUrl String
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model AgendaTomazinho {
@@ -90,6 +108,8 @@ model AgendaTomazinho {
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model NewCaxias {
@@ -116,6 +136,8 @@ model MinisterioCaxias {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   coverUrl String
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model AgendaCaxias {
@@ -127,4 +149,49 @@ model AgendaCaxias {
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Doacao {
+  id     String @id @default(uuid())
+  userId String
+
+  local     String
+  banco     String
+  conta     String
+  agencia   String
+  nomebanco String
+  pix       String
+  nomepix   String
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Endereco {
+  id     String @id @default(uuid())
+  userId String
+
+  local       String
+  rua      String
+  cep     String
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Contato {
+  id     String @id @default(uuid())
+  userId String
+
+  whatsapp       String
+  instagran      String
+  facebook     String
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }

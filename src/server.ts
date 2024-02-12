@@ -16,6 +16,9 @@ import { memoriesRoutesCaxias } from './routes/caxias/news'
 import { agendaRoutesTomazinho } from './routes/tomazinho/agenda'
 import { ministerioRoutesTomazinho } from './routes/tomazinho/ministerio'
 import { memoriesRoutesTomazinho } from './routes/tomazinho/news'
+import { doacaoRoutes } from './routes/doacao'
+import { enderecoRoutes } from './routes/endereco'
+import { contatoRoutes } from './routes/contato'
 
 const app = fastify()
 
@@ -45,6 +48,9 @@ app.register(memoriesRoutesCaxias)
 app.register(agendaRoutesTomazinho)
 app.register(ministerioRoutesTomazinho)
 app.register(memoriesRoutesTomazinho)
+app.register(doacaoRoutes)
+app.register(enderecoRoutes)
+app.register(contatoRoutes)
 
 app
   .listen({
