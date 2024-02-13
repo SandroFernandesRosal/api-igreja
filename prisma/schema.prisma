@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -187,6 +187,7 @@ model Contato {
   id     String @id @default(uuid())
   userId String
 
+  local     String
   whatsapp       String
   instagran      String
   facebook     String

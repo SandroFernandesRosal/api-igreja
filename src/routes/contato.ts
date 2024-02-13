@@ -13,6 +13,7 @@ export async function contatoRoutes(app: FastifyInstance) {
     return contatos.map((contato) => {
       return {
         id: contato.id,
+        local: contato.local,
         whatsapp: contato.whatsapp,
         instagran: contato.instagran,
         facebook: contato.facebook,
@@ -41,18 +42,20 @@ export async function contatoRoutes(app: FastifyInstance) {
     await request.jwtVerify()
 
     const bodySchema = z.object({
+      local: z.string(),
       whatsapp: z.string(),
       instagran: z.string(),
       facebook: z.string(),
       isPublic: z.coerce.boolean().default(false),
     })
 
-    const { whatsapp, instagran, isPublic, facebook } = bodySchema.parse(
+    const { local, whatsapp, instagran, isPublic, facebook } = bodySchema.parse(
       request.body,
     )
 
     const contato = await prisma.contato.create({
       data: {
+        local,
         whatsapp,
         instagran,
         facebook,
@@ -74,13 +77,14 @@ export async function contatoRoutes(app: FastifyInstance) {
     const { id } = paramsSchema.parse(request.params)
 
     const bodySchema = z.object({
+      local: z.string(),
       whatsapp: z.string(),
       instagran: z.string(),
       facebook: z.string(),
       isPublic: z.coerce.boolean().default(false),
     })
 
-    const { whatsapp, instagran, isPublic, facebook } = bodySchema.parse(
+    const { local, whatsapp, instagran, isPublic, facebook } = bodySchema.parse(
       request.body,
     )
 
@@ -95,6 +99,7 @@ export async function contatoRoutes(app: FastifyInstance) {
         id,
       },
       data: {
+        local,
         whatsapp,
         instagran,
         facebook,
