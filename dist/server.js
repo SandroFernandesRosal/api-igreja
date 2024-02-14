@@ -51,6 +51,7 @@ app.register(endereco_1.enderecoRoutes);
 app.register(contato_1.contatoRoutes);
 app
     .listen({
+    host: '0.0.0.0',
     port: process.env.PORT ? Number(process.env.PORT) : 3333,
 })
     .then(() => {
