@@ -152,12 +152,12 @@ export async function authRoutes(app: FastifyInstance) {
 
     const bodySchema = z.object({
       name: z.string(),
-      login: z.string(),
+
       avatarUrl: z.string(),
       password: z.string(),
     })
 
-    const { name, avatarUrl, password, login } = bodySchema.parse(request.body)
+    const { name, avatarUrl, password } = bodySchema.parse(request.body)
 
     const user = await prisma.user.update({
       where: {
@@ -165,7 +165,7 @@ export async function authRoutes(app: FastifyInstance) {
       },
       data: {
         name,
-        login,
+
         avatarUrl,
         password,
       },
