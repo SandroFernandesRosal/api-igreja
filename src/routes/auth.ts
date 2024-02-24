@@ -57,7 +57,7 @@ export async function authRoutes(app: FastifyInstance) {
         },
         {
           sub: user.id,
-          expiresIn: '30 days',
+          expiresIn: '30d',
         },
       )
 
@@ -124,7 +124,6 @@ export async function authRoutes(app: FastifyInstance) {
             name: user.name,
             avatarUrl: user.avatarUrl,
             login: user.login,
-            password: user.password,
           },
           {
             sub: user.id,
@@ -153,12 +152,12 @@ export async function authRoutes(app: FastifyInstance) {
 
     const bodySchema = z.object({
       name: z.string(),
-
+      login: z.string(),
       avatarUrl: z.string(),
       password: z.string(),
     })
 
-    const { name, avatarUrl, password } = bodySchema.parse(request.body)
+    const { name, avatarUrl, password, login } = bodySchema.parse(request.body)
 
     const user = await prisma.user.update({
       where: {
@@ -166,13 +165,25 @@ export async function authRoutes(app: FastifyInstance) {
       },
       data: {
         name,
-
+        login,
         avatarUrl,
         password,
       },
     })
 
-    return user
+    const token = app.jwt.sign(
+      {
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        login: user.login,
+      },
+      {
+        sub: user.id,
+        expiresIn: '30d',
+      },
+    )
+
+    return { user, token }
   })
 
   app.delete('/register/:id', async (request, reply) => {
