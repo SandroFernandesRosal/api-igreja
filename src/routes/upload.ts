@@ -58,6 +58,9 @@ export async function uploadRoutes(app: FastifyInstance) {
       fields: 'id',
     })
 
-    return response
+    // Obtenha a URL do arquivo
+    const fileUrl = `https://drive.google.com/file/d/${response.data.id}/view?usp=sharing`
+
+    return { fileUrl }
   })
 }
