@@ -17,6 +17,7 @@ export async function enderecoRoutes(app: FastifyInstance) {
         rua: endereco.rua,
         cep: endereco.cep,
         createdAt: endereco.createdAt,
+        updatedAt: endereco.updatedAt,
       }
     })
   })

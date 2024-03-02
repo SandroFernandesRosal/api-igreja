@@ -17,6 +17,7 @@ export async function ministerioRoutesCaxias(app: FastifyInstance) {
         title: ministerio.title,
         local: ministerio.local,
         createdAt: ministerio.createdAt,
+        updatedAt: ministerio.updatedAt,
         coverUrl: ministerio.coverUrl,
       }
     })
@@ -34,10 +35,6 @@ export async function ministerioRoutesCaxias(app: FastifyInstance) {
         id,
       },
     })
-
-    if (!ministerio.isPublic && ministerio.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     return ministerio
   })

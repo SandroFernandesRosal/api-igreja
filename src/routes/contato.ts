@@ -18,6 +18,7 @@ export async function contatoRoutes(app: FastifyInstance) {
         instagran: contato.instagran,
         facebook: contato.facebook,
         createdAt: contato.createdAt,
+        updatedAt: contato.updatedAt,
       }
     })
   })

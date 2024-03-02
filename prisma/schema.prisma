@@ -29,6 +29,7 @@ model User {
   doacao Doacao[]
   endereco Endereco[]
   contato Contato[]
+  sobre Sobre[]
 }
 
 model New {
@@ -38,6 +39,7 @@ model New {
   content   String
   title     String
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   isPublic  Boolean  @default(true)
   page      String
 
@@ -53,6 +55,7 @@ model Ministerio {
   local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   coverUrl String
 
   user User @relation(fields: [userId], references: [id])
@@ -67,6 +70,7 @@ model Agenda {
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -80,6 +84,7 @@ model NewTomazinho {
   title     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   page      String
 
   user User @relation(fields: [userId], references: [id])
@@ -94,6 +99,7 @@ model MinisterioTomazinho {
   local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   coverUrl String
 
   user User @relation(fields: [userId], references: [id])
@@ -108,6 +114,7 @@ model AgendaTomazinho {
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -121,6 +128,7 @@ model NewCaxias {
   title     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   page      String
 
   user User @relation(fields: [userId], references: [id])
@@ -135,6 +143,7 @@ model MinisterioCaxias {
   local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   coverUrl String
 
   user User @relation(fields: [userId], references: [id])
@@ -149,6 +158,7 @@ model AgendaCaxias {
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -166,6 +176,7 @@ model Doacao {
   nomepix   String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -179,6 +190,7 @@ model Endereco {
   cep     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
 }
@@ -193,6 +205,20 @@ model Contato {
   facebook     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Sobre {
+  id        String   @id @default(uuid())
+  userId    String
+  coverUrl  String
+  content   String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isPublic  Boolean  @default(true)
+  
   user User @relation(fields: [userId], references: [id])
 }

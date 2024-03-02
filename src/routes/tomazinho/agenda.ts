@@ -17,6 +17,7 @@ export async function agendaRoutesTomazinho(app: FastifyInstance) {
         day: agenda.day,
         hour: agenda.hour,
         createdAt: agenda.createdAt,
+        updatedAt: agenda.updatedAt,
       }
     })
   })
@@ -33,10 +34,6 @@ export async function agendaRoutesTomazinho(app: FastifyInstance) {
         id,
       },
     })
-
-    if (!agenda.isPublic && agenda.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     return agenda
   })

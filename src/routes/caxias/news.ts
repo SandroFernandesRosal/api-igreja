@@ -18,6 +18,7 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
         content: memory.content,
         excerpt: memory.content.substring(0, 115).concat('...'),
         createdAt: memory.createdAt,
+        updatedAt: memory.updatedAt,
         page: memory.page,
       }
     })
@@ -35,10 +36,6 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
         id,
       },
     })
-
-    if (!memory.isPublic && memory.userId !== request.user.sub) {
-      return reply.status(401).send()
-    }
 
     return memory
   })

@@ -1,12 +1,12 @@
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../../lib/prisma'
+import { prisma } from '../lib/prisma'
 
-export async function memoriesRoutesTomazinho(app: FastifyInstance) {
-  app.get('/news/tomazinho', async (request) => {
-    const memories = await prisma.newTomazinho.findMany({
+export async function sobreRoutes(app: FastifyInstance) {
+  app.get('/sobre', async (request) => {
+    const memories = await prisma.sobre.findMany({
       orderBy: {
-        createdAt: 'desc',
+        createdAt: 'asc',
       },
     })
 
@@ -19,19 +19,18 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
         excerpt: memory.content.substring(0, 115).concat('...'),
         createdAt: memory.createdAt,
         updatedAt: memory.updatedAt,
-        page: memory.page,
       }
     })
   })
 
-  app.get('/news/tomazinho/:id', async (request, reply) => {
+  app.get('/sobre/:id', async (request, reply) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
 
-    const memory = await prisma.newTomazinho.findUniqueOrThrow({
+    const memory = await prisma.sobre.findUniqueOrThrow({
       where: {
         id,
       },
@@ -40,7 +39,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
     return memory
   })
 
-  app.get('/news/tomazinho/search', async (request) => {
+  app.get('/sobre/search', async (request) => {
     const paramsSchema = z.object({
       search: z.string(),
     })
@@ -52,7 +51,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
         throw new Error('Query parameter is missing')
       }
 
-      const memories = await prisma.newTomazinho.findMany({
+      const memories = await prisma.sobre.findMany({
         where: {
           OR: [{ title: { contains: search } }],
         },
@@ -66,7 +65,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
           content: memory.content,
           excerpt: memory.content.substring(0, 115).concat('...'),
           createdAt: memory.createdAt,
-          page: memory.page,
+          updatedAt: memory.updatedAt,
         }
       })
     } catch (error) {
@@ -75,7 +74,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
     }
   })
 
-  app.post('/news/tomazinho', async (request) => {
+  app.post('/sobre', async (request) => {
     await request.jwtVerify()
 
     const bodySchema = z.object({
@@ -83,28 +82,26 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
       coverUrl: z.string(),
       title: z.string(),
       isPublic: z.coerce.boolean().default(false),
-      page: z.string(),
     })
 
-    const { content, coverUrl, isPublic, title, page } = bodySchema.parse(
+    const { content, coverUrl, isPublic, title } = bodySchema.parse(
       request.body,
     )
 
-    const memory = await prisma.newTomazinho.create({
+    const memory = await prisma.sobre.create({
       data: {
         content,
         coverUrl,
         title,
         isPublic,
         userId: request.user.sub,
-        page,
       },
     })
 
     return memory
   })
 
-  app.put('/news/tomazinho/:id', async (request, reply) => {
+  app.put('/sobre/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
@@ -118,20 +115,19 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
       coverUrl: z.string(),
       title: z.string(),
       isPublic: z.coerce.boolean().default(false),
-      page: z.string(),
     })
 
-    const { content, coverUrl, isPublic, title, page } = bodySchema.parse(
+    const { content, coverUrl, isPublic, title } = bodySchema.parse(
       request.body,
     )
 
-    let memory = await prisma.newTomazinho.findUniqueOrThrow({
+    let memory = await prisma.sobre.findUniqueOrThrow({
       where: {
         id,
       },
     })
 
-    memory = await prisma.newTomazinho.update({
+    memory = await prisma.sobre.update({
       where: {
         id,
       },
@@ -140,14 +136,13 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
         coverUrl,
         title,
         isPublic,
-        page,
       },
     })
 
     return memory
   })
 
-  app.delete('/news/tomazinho/:id', async (request, reply) => {
+  app.delete('/sobre/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
@@ -156,13 +151,13 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    await prisma.newTomazinho.findUniqueOrThrow({
+    await prisma.sobre.findUniqueOrThrow({
       where: {
         id,
       },
     })
 
-    await prisma.newTomazinho.delete({
+    await prisma.sobre.delete({
       where: {
         id,
       },

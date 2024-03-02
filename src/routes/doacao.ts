@@ -21,6 +21,7 @@ export async function doacaoRoutes(app: FastifyInstance) {
         pix: doacao.pix,
         nomepix: doacao.nomepix,
         createdAt: doacao.createdAt,
+        updatedAt: doacao.updatedAt,
       }
     })
   })
