@@ -8,28 +8,24 @@ datasource db {
 }
 
 model User {
-  id        String @id @default(uuid())
-  login     String @unique
-  name      String
-  avatarUrl String
-  password  String
-
-  news          New[]
-  ministerio Ministerio[]
-  agenda Agenda[]
-
-  newstomazinho NewTomazinho[]
+  id                  String                @id @default(uuid())
+  login               String                @unique
+  name                String
+  avatarUrl           String
+  password            String
+  agenda              Agenda[]
+  agendacaxias        AgendaCaxias[]
+  agendatomazinho     AgendaTomazinho[]
+  contato             Contato[]
+  doacao              Doacao[]
+  endereco            Endereco[]
+  ministerio          Ministerio[]
+  ministeriocaxias    MinisterioCaxias[]
   ministeriotomazinho MinisterioTomazinho[]
-  agendatomazinho AgendaTomazinho[]
-
-  newscaxias    NewCaxias[]
-  ministeriocaxias MinisterioCaxias[]
-  agendacaxias AgendaCaxias[]
-
-  doacao Doacao[]
-  endereco Endereco[]
-  contato Contato[]
-  sobre Sobre[]
+  news                New[]
+  newscaxias          NewCaxias[]
+  newstomazinho       NewTomazinho[]
+  sobre               Sobre[]
 }
 
 model New {
@@ -39,134 +35,116 @@ model New {
   content   String
   title     String
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
   isPublic  Boolean  @default(true)
   page      String
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Ministerio {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   name      String
   title     String
   local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  coverUrl String
-
-  user User @relation(fields: [userId], references: [id])
+  coverUrl  String
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Agenda {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   day       String
   name      String
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model NewTomazinho {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   coverUrl  String
   content   String
   title     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
   page      String
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model MinisterioTomazinho {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   name      String
   title     String
   local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  coverUrl String
-
-  user User @relation(fields: [userId], references: [id])
+  coverUrl  String
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model AgendaTomazinho {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   day       String
   name      String
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model NewCaxias {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   coverUrl  String
   content   String
   title     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
   page      String
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model MinisterioCaxias {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   name      String
   title     String
   local     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  coverUrl String
-
-  user User @relation(fields: [userId], references: [id])
+  coverUrl  String
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model AgendaCaxias {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   day       String
   name      String
   hour      String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Doacao {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   local     String
   banco     String
   conta     String
@@ -176,38 +154,33 @@ model Doacao {
   nomepix   String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Endereco {
-  id     String @id @default(uuid())
-  userId String
-
-  local       String
-  rua      String
-  cep     String
+  id        String   @id @default(uuid())
+  userId    String
+  local     String
+  rua       String
+  cep       String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Contato {
-  id     String @id @default(uuid())
-  userId String
-
+  id        String   @id @default(uuid())
+  userId    String
   local     String
-  whatsapp       String
-  instagran      String
-  facebook     String
+  whatsapp  String
+  instagran String
+  facebook  String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Sobre {
@@ -219,6 +192,5 @@ model Sobre {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isPublic  Boolean  @default(true)
-  
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }

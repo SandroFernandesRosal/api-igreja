@@ -19,6 +19,7 @@ import { memoriesRoutesTomazinho } from './routes/tomazinho/news'
 import { doacaoRoutes } from './routes/doacao'
 import { enderecoRoutes } from './routes/endereco'
 import { contatoRoutes } from './routes/contato'
+import { sobreRoutes } from './routes/sobre'
 
 const app = fastify()
 
@@ -51,6 +52,7 @@ app.register(memoriesRoutesTomazinho)
 app.register(doacaoRoutes)
 app.register(enderecoRoutes)
 app.register(contatoRoutes)
+app.register(sobreRoutes)
 
 app
   .listen({
