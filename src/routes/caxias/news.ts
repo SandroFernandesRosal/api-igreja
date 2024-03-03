@@ -66,6 +66,7 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
           content: memory.content,
           excerpt: memory.content.substring(0, 115).concat('...'),
           createdAt: memory.createdAt,
+          updatedAt: memory.updatedAt,
           page: memory.page,
         }
       })
