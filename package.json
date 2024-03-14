@@ -11,8 +11,8 @@
     "dev": "tsx watch src/server.ts",
     "lint": "eslint src --ext .ts --fix",
     "vercel-build": "npx prisma migrate deploy",
-    "build": "tsc",
-    "start": "node --trace-warnings  dist/server.js"
+    
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
