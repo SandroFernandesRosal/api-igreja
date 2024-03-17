@@ -54,7 +54,7 @@ export async function sobreRoutes(app: FastifyInstance) {
     return memory
   })
 
-  app.put('/sobre/:id', async (request, reply) => {
+  app.put('/sobre/lider/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
@@ -93,7 +93,7 @@ export async function sobreRoutes(app: FastifyInstance) {
     return memory
   })
 
-  app.delete('/sobre/:id', async (request, reply) => {
+  app.delete('/sobre/lider/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
