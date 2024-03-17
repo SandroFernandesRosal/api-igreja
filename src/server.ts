@@ -20,6 +20,7 @@ import { doacaoRoutes } from './routes/doacao'
 import { enderecoRoutes } from './routes/endereco'
 import { contatoRoutes } from './routes/contato'
 import { sobreRoutes } from './routes/sobre'
+import { sobreLiderRoutes } from './routes/sobreLider'
 
 const app = fastify()
 
@@ -53,6 +54,7 @@ app.register(doacaoRoutes)
 app.register(enderecoRoutes)
 app.register(contatoRoutes)
 app.register(sobreRoutes)
+app.register(sobreLiderRoutes)
 
 app
   .listen({
