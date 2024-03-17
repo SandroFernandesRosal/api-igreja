@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 
-export async function sobreRoutes(app: FastifyInstance) {
+export async function sobreLiderRoutes(app: FastifyInstance) {
   app.get('/sobre/lider', async (request) => {
     const memories = await prisma.sobreLider.findMany({
       orderBy: {
