@@ -27,6 +27,7 @@ model User {
   newstomazinho       NewTomazinho[]
   sobre               Sobre[]
   sobree              Sobree[]
+  sobreLider          SobreLider[]
 }
 
 model New {
@@ -201,6 +202,18 @@ model Sobree {
   userId    String
   coverUrl  String
   content   String
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isPublic  Boolean  @default(true)
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model SobreLider {
+  id        String   @id @default(uuid())
+  userId    String
+  coverUrl  String
+  name      String
   title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -7,15 +7,7 @@ export async function authRoutes(app: FastifyInstance) {
   app.get('/register', async (request) => {
     const users = await prisma.user.findMany()
 
-    return users.map((user) => {
-      return {
-        id: user.id,
-        name: user.name,
-        avatarUrl: user.avatarUrl,
-        login: user.login,
-        password: user.password,
-      }
-    })
+    return users
   })
 
   app.get('/register/:id', async (request) => {
