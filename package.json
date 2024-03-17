@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "lint": "eslint src --ext .ts --fix",
@@ -20,7 +19,7 @@
     "dotenv": "^16.3.1",
     "eslint": "^8.40.0",
     "npm": "^10.5.0",
-    "prisma": "^4.16.2",
+    "prisma": "^5.11.0",
     "tsx": "^3.12.7",
     "typescript": "^5.0.4"
   },
@@ -29,7 +28,7 @@
     "@fastify/jwt": "^8.0.0",
     "@fastify/multipart": "^7.7.3",
     "@fastify/static": "^6.10.1",
-    "@prisma/client": "^4.14.0",
+    "@prisma/client": "^5.11.0",
     "@types/bcryptjs": "^2.4.6",
     "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
