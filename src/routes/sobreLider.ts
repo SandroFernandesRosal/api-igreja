@@ -89,7 +89,6 @@ export async function sobreLiderRoutes(app: FastifyInstance) {
         isPublic,
       },
     })
-
     return memory
   })
 
