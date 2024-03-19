@@ -27,6 +27,7 @@ model User {
   newstomazinho       NewTomazinho[]
   sobre               Sobre[]
   sobreLider          SobreLider[]
+  refreshToken        RefreshToken[]
 }
 
 model New {
@@ -214,4 +215,5 @@ model RefreshToken {
   token     String @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
