@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import bcrypt from 'bcryptjs'
+import { v4 as uuidv4 } from 'uuid'
 
 export async function authRoutes(app: FastifyInstance) {
   app.get('/register', async (request) => {
@@ -26,6 +27,10 @@ export async function authRoutes(app: FastifyInstance) {
     return user
   })
 
+  function generateRefreshToken() {
+    return uuidv4()
+  }
+
   app.post('/login', async (request) => {
     const userSchema = z.object({
       login: z.string(),
@@ -41,22 +46,92 @@ export async function authRoutes(app: FastifyInstance) {
         return { error: 'Credenciais inválidas.' }
       }
 
-      const token = app.jwt.sign(
+      const accessToken = app.jwt.sign(
         {
           name: user.name,
           avatarUrl: user.avatarUrl,
           login: user.login,
         },
         {
-          sub: user.id,
-          expiresIn: '30d',
+          expiresIn: '1d', // 1 dia para access token
         },
       )
 
-      return { user, token }
+      const refreshToken = generateRefreshToken()
+
+      // Armazena o refresh token no banco de dados
+      await prisma.refreshToken.create({
+        data: {
+          userId: user.id,
+          token: refreshToken,
+        },
+      })
+
+      return { user, accessToken, refreshToken }
     } catch (error) {
       console.error(error)
       return { error: 'Erro na autenticação' }
+    }
+  })
+
+  // Renovação de token
+  app.post('/refresh-token', async (request) => {
+    const refreshTokenSchema = z.object({
+      refreshToken: z.string(),
+    })
+
+    try {
+      const { refreshToken } = refreshTokenSchema.parse(request.body)
+
+      // Valida o refresh token
+      const refreshTokenData = await prisma.refreshToken.findUnique({
+        where: {
+          token: refreshToken,
+        },
+      })
+
+      if (!refreshTokenData) {
+        return { error: 'Refresh token inválido.' }
+      }
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: refreshTokenData.userId,
+        },
+      })
+
+      if (!user) {
+        return { error: 'Usuário não encontrado.' }
+      }
+
+      // Gera novos tokens
+      const accessToken = app.jwt.sign(
+        {
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+          login: user.login,
+        },
+        {
+          expiresIn: '1d',
+        },
+      )
+
+      const newRefreshToken = generateRefreshToken()
+
+      // Atualiza o refresh token no banco de dados
+      await prisma.refreshToken.update({
+        where: {
+          id: refreshTokenData.id,
+        },
+        data: {
+          token: newRefreshToken,
+        },
+      })
+
+      return { accessToken, refreshToken: newRefreshToken }
+    } catch (error) {
+      console.error(error)
+      return { error: 'Erro ao renovar token' }
     }
   })
 
