@@ -225,7 +225,7 @@ export async function authRoutes(app: FastifyInstance) {
     return { user, token }
   })
 
-  app.delete('/register/:id', async (request, reply) => {
+  app.delete('/register/:id', async (request) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
