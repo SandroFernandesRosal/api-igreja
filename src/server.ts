@@ -6,6 +6,7 @@ import jwt from '@fastify/jwt'
 import multipart from '@fastify/multipart'
 import { memoriesRoutes } from './routes/vp/news'
 import { authRoutes } from './routes/auth'
+import { authIgrejaRoutes } from './routes/authIgreja'
 import { uploadRoutes } from './routes/upload'
 import { resolve } from 'node:path'
 import { ministerioRoutes } from './routes/vp/ministerio'
@@ -40,6 +41,7 @@ app.register(jwt, {
 })
 
 app.register(authRoutes)
+app.register(authIgrejaRoutes)
 app.register(uploadRoutes)
 app.register(memoriesRoutes)
 app.register(ministerioRoutes)

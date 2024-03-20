@@ -31,6 +31,16 @@ model User {
   refreshToken        RefreshToken[]
 }
 
+model UserIgreja {
+  id                  String                @id @default(uuid())
+  login               String                @unique
+  name                String
+  avatarUrl           String
+  password            String
+  testemunho          Testemunho[]
+  refreshTokenIgreja  RefreshTokenIgreja[]
+}
+
 model New {
   id        String   @id @default(uuid())
   userId    String
@@ -41,7 +51,7 @@ model New {
   isPublic  Boolean  @default(true)
   page      String
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Ministerio {
@@ -54,7 +64,7 @@ model Ministerio {
   createdAt DateTime @default(now())
   coverUrl  String
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Agenda {
@@ -66,7 +76,7 @@ model Agenda {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model NewTomazinho {
@@ -79,7 +89,7 @@ model NewTomazinho {
   createdAt DateTime @default(now())
   page      String
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model MinisterioTomazinho {
@@ -92,7 +102,7 @@ model MinisterioTomazinho {
   createdAt DateTime @default(now())
   coverUrl  String
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AgendaTomazinho {
@@ -104,7 +114,7 @@ model AgendaTomazinho {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model NewCaxias {
@@ -117,7 +127,7 @@ model NewCaxias {
   createdAt DateTime @default(now())
   page      String
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model MinisterioCaxias {
@@ -130,7 +140,7 @@ model MinisterioCaxias {
   createdAt DateTime @default(now())
   coverUrl  String
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model AgendaCaxias {
@@ -142,7 +152,7 @@ model AgendaCaxias {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Doacao {
@@ -158,7 +168,7 @@ model Doacao {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Endereco {
@@ -170,7 +180,7 @@ model Endereco {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Contato {
@@ -183,7 +193,7 @@ model Contato {
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Sobre {
@@ -195,7 +205,7 @@ model Sobre {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isPublic  Boolean  @default(true)
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model SobreLider {
@@ -207,14 +217,35 @@ model SobreLider {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isPublic  Boolean  @default(true)
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model RefreshToken {
  id        String   @id @default(uuid())
  token     String   @unique
  userId    String
- user      User     @relation(fields: [userId], references: [id])
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Testemunho {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  avatarUrl String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isPublic  Boolean  @default(true)
+  userIgreja      UserIgreja     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RefreshTokenIgreja {
+ id        String   @id @default(uuid())
+ token     String   @unique
+ userId    String
+userIgreja      UserIgreja     @relation(fields: [userId], references: [id], onDelete: Cascade)
  createdAt DateTime @default(now())
  updatedAt DateTime @updatedAt
 }
