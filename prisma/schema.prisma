@@ -13,6 +13,7 @@ model User {
   name                String
   avatarUrl           String
   password            String
+  
   agenda              Agenda[]
   agendacaxias        AgendaCaxias[]
   agendatomazinho     AgendaTomazinho[]
@@ -210,10 +211,10 @@ model SobreLider {
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
-  userId    String
-  token     String @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
+ id        String   @id @default(uuid())
+ token     String   @unique
+ userId    String
+ user      User     @relation(fields: [userId], references: [id])
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
 }
