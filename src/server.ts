@@ -22,6 +22,7 @@ import { enderecoRoutes } from './routes/endereco'
 import { contatoRoutes } from './routes/contato'
 import { sobreRoutes } from './routes/sobre'
 import { sobreLiderRoutes } from './routes/sobreLider'
+import { testemunhoRoutes } from './routes/testemunho'
 
 const app = fastify()
 
@@ -57,6 +58,7 @@ app.register(enderecoRoutes)
 app.register(contatoRoutes)
 app.register(sobreRoutes)
 app.register(sobreLiderRoutes)
+app.register(testemunhoRoutes)
 
 app
   .listen({
