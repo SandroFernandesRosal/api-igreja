@@ -6,7 +6,7 @@ export async function testemunhoRoutes(app: FastifyInstance) {
   app.get('/testemunhos', async (request) => {
     const memories = await prisma.testemunho.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
