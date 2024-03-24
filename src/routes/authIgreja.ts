@@ -53,6 +53,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
 
       const token = app.jwt.sign(
         {
+          id: user.id,
           name: user.name,
           avatarUrl: user.avatarUrl,
           login: user.login,
