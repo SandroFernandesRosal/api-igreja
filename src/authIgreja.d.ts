@@ -2,7 +2,7 @@ import '@fastify/jwt'
 
 declare module '@fastify/jwt' {
   export interface FastifyJWT {
-    user: {
+    userIgreja: {
       id: string
       sub: string
       name: string
