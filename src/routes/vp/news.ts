@@ -10,18 +10,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
       },
     })
 
-    return memories.map((memory) => {
-      return {
-        id: memory.id,
-        coverUrl: memory.coverUrl,
-        title: memory.title,
-        content: memory.content,
-        excerpt: memory.content.substring(0, 115).concat('...'),
-        createdAt: memory.createdAt,
-        updatedAt: memory.updatedAt,
-        page: memory.page,
-      }
-    })
+    return memories
   })
 
   app.get('/news/viladapenha/:id', async (request, reply) => {

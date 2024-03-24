@@ -6,21 +6,11 @@ export async function sobreRoutes(app: FastifyInstance) {
   app.get('/sobre', async (request) => {
     const memories = await prisma.sobre.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 
-    return memories.map((memory) => {
-      return {
-        id: memory.id,
-        coverUrl: memory.coverUrl,
-        title: memory.title,
-        content: memory.content,
-        excerpt: memory.content.substring(0, 115).concat('...'),
-        createdAt: memory.createdAt,
-        updatedAt: memory.updatedAt,
-      }
-    })
+    return memories
   })
 
   app.get('/sobre/:id', async (request, reply) => {

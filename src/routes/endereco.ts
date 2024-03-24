@@ -10,16 +10,7 @@ export async function enderecoRoutes(app: FastifyInstance) {
       },
     })
 
-    return enderecos.map((endereco) => {
-      return {
-        id: endereco.id,
-        local: endereco.local,
-        rua: endereco.rua,
-        cep: endereco.cep,
-        createdAt: endereco.createdAt,
-        updatedAt: endereco.updatedAt,
-      }
-    })
+    return enderecos
   })
 
   app.get('/endereco/:id', async (request, reply) => {

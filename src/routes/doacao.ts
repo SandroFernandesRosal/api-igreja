@@ -10,20 +10,7 @@ export async function doacaoRoutes(app: FastifyInstance) {
       },
     })
 
-    return doacoes.map((doacao) => {
-      return {
-        id: doacao.id,
-        local: doacao.local,
-        banco: doacao.banco,
-        conta: doacao.conta,
-        agencia: doacao.agencia,
-        nomebanco: doacao.nomebanco,
-        pix: doacao.pix,
-        nomepix: doacao.nomepix,
-        createdAt: doacao.createdAt,
-        updatedAt: doacao.updatedAt,
-      }
-    })
+    return doacoes
   })
 
   app.get('/doacao/:id', async (request, reply) => {

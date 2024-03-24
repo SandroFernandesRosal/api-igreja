@@ -10,16 +10,7 @@ export async function agendaRoutesCaxias(app: FastifyInstance) {
       },
     })
 
-    return agendas.map((agenda) => {
-      return {
-        id: agenda.id,
-        name: agenda.name,
-        day: agenda.day,
-        hour: agenda.hour,
-        createdAt: agenda.createdAt,
-        updatedAt: agenda.updatedAt,
-      }
-    })
+    return agendas
   })
 
   app.get('/agenda/caxias/:id', async (request, reply) => {

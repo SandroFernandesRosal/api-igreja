@@ -6,7 +6,7 @@ export async function sobreLiderRoutes(app: FastifyInstance) {
   app.get('/sobre/lider', async (request) => {
     const memories = await prisma.sobreLider.findMany({
       orderBy: {
-        createdAt: 'asc',
+        createdAt: 'desc',
       },
     })
 

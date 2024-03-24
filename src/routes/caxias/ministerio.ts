@@ -10,17 +10,7 @@ export async function ministerioRoutesCaxias(app: FastifyInstance) {
       },
     })
 
-    return ministerios.map((ministerio) => {
-      return {
-        id: ministerio.id,
-        name: ministerio.name,
-        title: ministerio.title,
-        local: ministerio.local,
-        createdAt: ministerio.createdAt,
-        updatedAt: ministerio.updatedAt,
-        coverUrl: ministerio.coverUrl,
-      }
-    })
+    return ministerios
   })
 
   app.get('/minsterio/caxias/:id', async (request, reply) => {

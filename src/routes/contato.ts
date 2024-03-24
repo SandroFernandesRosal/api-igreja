@@ -10,17 +10,7 @@ export async function contatoRoutes(app: FastifyInstance) {
       },
     })
 
-    return contatos.map((contato) => {
-      return {
-        id: contato.id,
-        local: contato.local,
-        whatsapp: contato.whatsapp,
-        instagran: contato.instagran,
-        facebook: contato.facebook,
-        createdAt: contato.createdAt,
-        updatedAt: contato.updatedAt,
-      }
-    })
+    return contatos
   })
 
   app.get('/contato/:id', async (request, reply) => {

@@ -10,17 +10,7 @@ export async function ministerioRoutes(app: FastifyInstance) {
       },
     })
 
-    return ministerios.map((ministerio) => {
-      return {
-        id: ministerio.id,
-        name: ministerio.name,
-        title: ministerio.title,
-        local: ministerio.local,
-        createdAt: ministerio.createdAt,
-        updatedAt: ministerio.updatedAt,
-        coverUrl: ministerio.coverUrl,
-      }
-    })
+    return ministerios
   })
 
   app.get('/minsterio/viladapenha/:id', async (request, reply) => {
