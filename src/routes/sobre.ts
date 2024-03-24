@@ -47,17 +47,7 @@ export async function sobreRoutes(app: FastifyInstance) {
         },
       })
 
-      return memories.map((memory) => {
-        return {
-          id: memory.id,
-          coverUrl: memory.coverUrl,
-          title: memory.title,
-          content: memory.content,
-          excerpt: memory.content.substring(0, 115).concat('...'),
-          createdAt: memory.createdAt,
-          updatedAt: memory.updatedAt,
-        }
-      })
+      return memories
     } catch (error) {
       // Trate o erro de maneira apropriada, como retornar um código de erro HTTP 500
       return { error: 'Internal Server Error' }
