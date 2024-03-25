@@ -3,6 +3,16 @@ import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
+const nodemailer = require('nodemailer')
+
+// Configuração do transporte do Nodemailer para o Gmail
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'apg.adm.viladapenha@gmail.com', // Substitua pelo seu e-mail do Gmail
+    pass: process.env.PASSWORD_GMAIL, // Substitua pela sua senha do Gmail
+  },
+})
 
 export async function authIgrejaRoutes(app: FastifyInstance) {
   app.get('/register/igreja', async (request) => {
@@ -48,6 +58,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         data: {
           token: refreshToken,
           userId: user.id,
+          id: user.id,
         },
       })
 
@@ -87,45 +98,70 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     return isPasswordValid ? user : false
   }
 
-  app.post('/refresh-token/igreja', async (request, reply) => {
-    const refreshTokenSchema = z.object({
-      refreshToken: z.string(),
+  app.post('/recover-password', async (request, reply) => {
+    const userSchema = z.object({
+      login: z.string().email({ message: 'Email inválido' }),
+    })
+    const { login } = userSchema.parse(request.body)
+
+    // Verifique se o e-mail existe no banco de dados
+    const user = await prisma.userIgreja.findUnique({
+      where: { login },
     })
 
-    const { refreshToken } = refreshTokenSchema.parse(request.body)
-
-    const refreshTokenRecord = await prisma.refreshTokenIgreja.findUnique({
-      where: { token: refreshToken },
-      include: { userIgreja: true },
-    })
-
-    if (!refreshTokenRecord) {
-      return { error: 'Refresh token inválido.' }
+    if (!user) {
+      return { error: 'E-mail não encontrado' }
     }
 
-    const user = refreshTokenRecord.userIgreja
+    // Gere um token de recuperação de senha
+    const token = uuidv4()
 
-    const newToken = app.jwt.sign(
-      {
-        name: user.name,
-        avatarUrl: user.avatarUrl,
-        login: user.login,
+    // Armazene o token no banco de dados (exemplo simplificado)
+    await prisma.passwordResetTokenIgreja.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 3600000), // Expira em 1 hora
       },
-      {
-        sub: user.id,
-        expiresIn: '30d',
-      },
-    )
+    })
 
-    return { token: newToken }
+    // Opções do e-mail
+    const mailOptions = {
+      from: 'apg.adm.viladapenha@gmail.com', // Substitua pelo seu e-mail do Gmail
+      to: login, // E-mail do usuário
+      subject: 'Recuperação de Senha',
+      text: `Para redefinir sua senha, clique no link abaixo:
+      https://alcancadospelagraca.vercel.app/reset-password?token=${token}
+       Este link expira em 1 hora.`,
+    }
+
+    // Envie o e-mail
+    transporter.sendMail(mailOptions, (err: any, info: any) => {
+      if (err) {
+        console.error('Erro ao enviar e-mail: ', err)
+        return { error: 'Erro ao enviar e-mail de recuperação de senha' }
+      } else {
+        console.log('E-mail enviado: ' + info.response)
+        return { message: 'E-mail de recuperação de senha enviado' }
+      }
+    })
   })
 
   app.post('/register/igreja', async (request) => {
     const userSchema = z.object({
-      login: z.string(),
+      login: z.string().email({ message: 'Email inválido' }),
       name: z.string(),
       avatarUrl: z.string().url(),
-      password: z.string(),
+      password: z
+        .string()
+        .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
+        .max(10, { message: 'A senha deve ter no máximo 10 caracteres' })
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, {
+          message: 'A senha deve conter pelo menos um caractere especial',
+        })
+        .refine((value) => /[a-zA-Z]/.test(value), {
+          message: 'A senha deve conter pelo menos uma letra',
+        }),
     })
 
     try {
@@ -175,9 +211,48 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
 
       return { user, token, refreshToken }
     } catch (error) {
-      console.error(error)
-      return { error: 'Erro ao criar usuário' }
+      if (error instanceof z.ZodError) {
+        const erro = error.issues[0].message
+        console.error(erro)
+
+        return { erro }
+      } else {
+        console.error(error)
+      }
     }
+  })
+
+  app.post('/recover-password', async (request, reply) => {
+    const userSchema = z.object({
+      login: z.string().email({ message: 'Email inválido' }),
+    })
+    const { login } = userSchema.parse(request.body)
+
+    // Verifique se o e-mail existe no banco de dados
+    const user = await prisma.userIgreja.findUnique({
+      where: { login },
+    })
+
+    if (!user) {
+      return { error: 'E-mail não encontrado' }
+    }
+
+    // Gere um token de recuperação de senha
+    const token = uuidv4()
+
+    // Armazene o token no banco de dados (exemplo simplificado)
+    await prisma.passwordResetTokenIgreja.create({
+      data: {
+        token,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 3600000), // Expira em 1 hora
+      },
+    })
+
+    // Envie um e-mail ao usuário com o link de recuperação de senha
+    // (implementação do envio de e-mail depende da sua configuração)
+
+    return { message: 'E-mail de recuperação de senha enviado' }
   })
 
   app.put('/register/igreja/:id', async (request, reply) => {
@@ -191,39 +266,58 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
 
     const bodySchema = z.object({
       name: z.string(),
-
       avatarUrl: z.string(),
-      password: z.string(),
+      password: z
+        .string()
+        .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
+        .max(10, { message: 'A senha deve ter no máximo 10 caracteres' })
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, {
+          message: 'A senha deve conter pelo menos um caractere especial',
+        })
+        .refine((value) => /[a-zA-Z]/.test(value), {
+          message: 'A senha deve conter pelo menos uma letra',
+        }),
     })
 
-    const { name, avatarUrl, password } = bodySchema.parse(request.body)
+    try {
+      const { name, avatarUrl, password } = bodySchema.parse(request.body)
 
-    const senhaCriptografada = await bcrypt.hash(password, 10)
+      const senhaCriptografada = await bcrypt.hash(password, 10)
 
-    const user = await prisma.userIgreja.update({
-      where: {
-        id,
-      },
-      data: {
-        name,
-        avatarUrl,
-        password: senhaCriptografada,
-      },
-    })
+      const user = await prisma.userIgreja.update({
+        where: {
+          id,
+        },
+        data: {
+          name,
+          avatarUrl,
+          password: senhaCriptografada,
+        },
+      })
 
-    const token = app.jwt.sign(
-      {
-        name: user.name,
-        avatarUrl: user.avatarUrl,
-        login: user.login,
-      },
-      {
-        sub: user.id,
-        expiresIn: '30d',
-      },
-    )
+      const token = app.jwt.sign(
+        {
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+          login: user.login,
+        },
+        {
+          sub: user.id,
+          expiresIn: '30d',
+        },
+      )
 
-    return { user, token }
+      return { user, token }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const erro = error.issues[0].message
+        console.error(erro)
+
+        return { erro }
+      } else {
+        console.error(error)
+      }
+    }
   })
 
   app.delete('/register/igreja/:id', async (request) => {
