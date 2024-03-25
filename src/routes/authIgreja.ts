@@ -222,39 +222,6 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     }
   })
 
-  app.post('/recover-password', async (request, reply) => {
-    const userSchema = z.object({
-      login: z.string().email({ message: 'Email inválido' }),
-    })
-    const { login } = userSchema.parse(request.body)
-
-    // Verifique se o e-mail existe no banco de dados
-    const user = await prisma.userIgreja.findUnique({
-      where: { login },
-    })
-
-    if (!user) {
-      return { error: 'E-mail não encontrado' }
-    }
-
-    // Gere um token de recuperação de senha
-    const token = uuidv4()
-
-    // Armazene o token no banco de dados (exemplo simplificado)
-    await prisma.passwordResetTokenIgreja.create({
-      data: {
-        token,
-        userId: user.id,
-        expiresAt: new Date(Date.now() + 3600000), // Expira em 1 hora
-      },
-    })
-
-    // Envie um e-mail ao usuário com o link de recuperação de senha
-    // (implementação do envio de e-mail depende da sua configuração)
-
-    return { message: 'E-mail de recuperação de senha enviado' }
-  })
-
   app.put('/register/igreja/:id', async (request, reply) => {
     await request.jwtVerify()
 
