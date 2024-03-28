@@ -130,17 +130,15 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       },
     })
 
-    // Opções do e-mail
     const mailOptions = {
-      from: 'apg.adm.viladapenha@gmail.com', // Substitua pelo seu e-mail do Gmail
-      to: login, // E-mail do usuário
+      from: 'apg.adm.viladapenha@gmail.com',
+      to: login,
       subject: 'Recuperação de Senha',
       text: `Para redefinir sua senha, clique no link abaixo:
       https://alcancadospelagraca.vercel.app/reset-password?token=${token}
        Este link expira em 1 hora.`,
     }
 
-    // Envie o e-mail
     transporter.sendMail(mailOptions, (err: any, info: any) => {
       if (err) {
         console.error('Erro ao enviar e-mail: ', err)
