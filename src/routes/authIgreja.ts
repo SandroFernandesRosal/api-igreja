@@ -1,13 +1,18 @@
+import 'dotenv/config'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { prisma } from '../lib/prisma'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
+
 const nodemailer = require('nodemailer')
 
 // Configuração do transporte do Nodemailer para o Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: true,
   auth: {
     user: 'apg.adm.viladapenha@gmail.com', // Substitua pelo seu e-mail do Gmail
     pass: process.env.PASSWORD_GMAIL, // Substitua pela sua senha do Gmail
@@ -139,10 +144,12 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     transporter.sendMail(mailOptions, (err: any, info: any) => {
       if (err) {
         console.error('Erro ao enviar e-mail: ', err)
-        return { error: 'Erro ao enviar e-mail de recuperação de senha' }
+        reply
+          .code(500)
+          .send({ error: 'Erro ao enviar e-mail de recuperação de senha' })
       } else {
         console.log('E-mail enviado: ' + info.response)
-        return { message: 'E-mail de recuperação de senha enviado' }
+        reply.send({ message: 'E-mail de recuperação de senha enviado' })
       }
     })
   })
