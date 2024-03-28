@@ -119,7 +119,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     }
 
     // Gere um token de recuperação de senha
-    const token = user.id
+    const token = uuidv4()
 
     // Armazene o token no banco de dados (exemplo simplificado)
     await prisma.passwordResetTokenIgreja.create({
@@ -135,7 +135,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       to: login,
       subject: 'Recuperação de Senha',
       text: `Para redefinir sua senha, clique no link abaixo:
-      https://alcancadospelagraca.vercel.app/reset-password/${token}
+      https://alcancadospelagraca.vercel.app/reset-password/${user.id}
        Este link expira em 1 hora.`,
     }
 
