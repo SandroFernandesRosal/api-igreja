@@ -135,7 +135,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       to: login,
       subject: 'Recuperação de Senha',
       text: `Para redefinir sua senha, clique no link abaixo:
-      https://alcancadospelagraca.vercel.app/reset-password?token=${token}
+      https://alcancadospelagraca.vercel.app/reset-password/${token}
        Este link expira em 1 hora.`,
     }
 
@@ -150,6 +150,48 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         reply.send({ message: 'E-mail de recuperação de senha enviado' })
       }
     })
+  })
+
+  app.post('/reset-password', async (request, reply) => {
+    const resetPasswordSchema = z.object({
+      token: z.string().uuid(),
+      newPassword: z
+        .string()
+        .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' }),
+    })
+    const { token, newPassword } = resetPasswordSchema.parse(request.body)
+
+    // Verifique se o token de recuperação de senha existe e não expirou
+    const resetToken = await prisma.passwordResetTokenIgreja.findUnique({
+      where: { token },
+    })
+
+    if (!resetToken || resetToken.expiresAt < new Date()) {
+      return { error: 'Token inválido ou expirado' }
+    }
+
+    // Encontre o usuário associado ao token de recuperação
+    const user = await prisma.userIgreja.findUnique({
+      where: { id: resetToken.userId },
+    })
+
+    if (!user) {
+      return { error: 'Usuário não encontrado' }
+    }
+
+    // Hash a nova senha e atualize no banco de dados
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+    await prisma.userIgreja.update({
+      where: { id: user.id },
+      data: { password: hashedPassword },
+    })
+
+    // Remova o token de recuperação de senha após a redefinição bem-sucedida
+    await prisma.passwordResetTokenIgreja.delete({
+      where: { token },
+    })
+
+    reply.send({ message: 'Senha redefinida com sucesso' })
   })
 
   app.post('/register/igreja', async (request) => {
