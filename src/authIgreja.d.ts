@@ -9,6 +9,8 @@ declare module '@fastify/jwt' {
       avatarUrl: string
       password: string
       login: string
+      token: string
+      expiresAt: String
     }
   }
 }
