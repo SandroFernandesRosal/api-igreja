@@ -57,16 +57,6 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         return { error: 'Credenciais inválidas.' }
       }
 
-      const refreshToken = uuidv4()
-
-      await prisma.refreshTokenIgreja.create({
-        data: {
-          token: refreshToken,
-          userId: user.id,
-          id: user.id,
-        },
-      })
-
       const token = app.jwt.sign(
         {
           id: user.id,
@@ -80,7 +70,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         },
       )
 
-      return { user, token, refreshToken }
+      return { user, token }
     } catch (error) {
       console.error(error)
       return { error: 'Erro na autenticação' }
@@ -156,7 +146,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     const resetPasswordSchema = z.object({
       passwordResetToken: z.string(),
       login: z.string(),
-      newPassword: z
+      password: z
         .string()
         .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
         .max(10, { message: 'A senha deve ter no máximo 10 caracteres' })
@@ -167,8 +157,9 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
           message: 'A senha deve conter pelo menos uma letra',
         }),
     })
-    const { passwordResetToken, newPassword, login } =
-      resetPasswordSchema.parse(request.body)
+    const { passwordResetToken, password, login } = resetPasswordSchema.parse(
+      request.body,
+    )
 
     // Encontre o usuário associado ao token de recuperação
     const user = await prisma.userIgreja.findUnique({
@@ -179,12 +170,12 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       return { error: 'Usuário não encontrado' }
     }
 
-    if (passwordResetToken !== user.passwordResetToken) {
-      return { error: 'token inválido' }
+    if (user.passwordResetToken !== passwordResetToken) {
+      return { error: 'Token inválido' }
     }
 
     // Hash a nova senha e atualize no banco de dados
-    const hashedPassword = await bcrypt.hash(newPassword, 10)
+    const hashedPassword = await bcrypt.hash(password, 10)
     await prisma.userIgreja.update({
       where: { login },
       data: {
