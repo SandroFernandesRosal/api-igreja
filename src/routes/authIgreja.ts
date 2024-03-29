@@ -181,7 +181,12 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     const hashedPassword = await bcrypt.hash(newPassword, 10)
     await prisma.userIgreja.update({
       where: { login },
-      data: { password: hashedPassword },
+      data: {
+        password: hashedPassword,
+        login: user.login,
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+      },
     })
 
     reply.send({ message: 'Senha redefinida com sucesso' })
