@@ -154,15 +154,21 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
 
   app.post('/reset-password', async (request, reply) => {
     const resetPasswordSchema = z.object({
+      passwordResetToken: z.string(),
       login: z.string(),
-      token: z.string().uuid(),
       newPassword: z
         .string()
-        .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' }),
+        .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
+        .max(10, { message: 'A senha deve ter no máximo 10 caracteres' })
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, {
+          message: 'A senha deve conter pelo menos um caractere especial',
+        })
+        .refine((value) => /[a-zA-Z]/.test(value), {
+          message: 'A senha deve conter pelo menos uma letra',
+        }),
     })
-    const { token, newPassword, login } = resetPasswordSchema.parse(
-      request.body,
-    )
+    const { passwordResetToken, newPassword, login } =
+      resetPasswordSchema.parse(request.body)
 
     // Encontre o usuário associado ao token de recuperação
     const user = await prisma.userIgreja.findUnique({
@@ -173,7 +179,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       return { error: 'Usuário não encontrado' }
     }
 
-    if (token !== user.passwordResetToken) {
+    if (passwordResetToken !== user.passwordResetToken) {
       return { error: 'token inválido' }
     }
 
@@ -183,9 +189,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       where: { login },
       data: {
         password: hashedPassword,
-        login: user.login,
-        name: user.name,
-        avatarUrl: user.avatarUrl,
+        passwordResetToken,
       },
     })
 
