@@ -170,8 +170,12 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       return { error: 'Usuário não encontrado' }
     }
 
-    if (user.passwordResetToken !== passwordResetToken) {
-      return { error: 'Token inválido' }
+    if (
+      user.passwordResetToken !== passwordResetToken ||
+      !user.expires ||
+      user.expires < new Date()
+    ) {
+      return { error: 'Token inválido ou expirado' }
     }
 
     // Hash a nova senha e atualize no banco de dados
