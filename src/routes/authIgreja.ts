@@ -167,7 +167,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       })
 
       if (!user) {
-        return { error: 'Usuário não encontrado' }
+        return reply.status(404).send({ error: 'Usuário não encontrado' })
       }
 
       if (
@@ -175,7 +175,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         !user.expires ||
         user.expires < new Date()
       ) {
-        return { error: 'Token inválido ou expirado' }
+        return reply.status(400).send({ error: 'Token inválido ou expirado' })
       }
 
       const hashedPassword = await bcrypt.hash(password, 10)
