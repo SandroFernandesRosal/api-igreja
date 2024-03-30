@@ -143,52 +143,59 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
   })
 
   app.post('/reset-password', async (request, reply) => {
-    const resetPasswordSchema = z.object({
-      passwordResetToken: z.string(),
-      login: z.string(),
-      password: z
-        .string()
-        .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
-        .max(10, { message: 'A senha deve ter no máximo 10 caracteres' })
-        .regex(/[!@#$%^&*(),.?":{}|<>]/, {
-          message: 'A senha deve conter pelo menos um caractere especial',
-        })
-        .refine((value) => /[a-zA-Z]/.test(value), {
-          message: 'A senha deve conter pelo menos uma letra',
-        }),
-    })
-    const { passwordResetToken, password, login } = resetPasswordSchema.parse(
-      request.body,
-    )
+    try {
+      const resetPasswordSchema = z.object({
+        passwordResetToken: z.string(),
+        login: z.string(),
+        password: z
+          .string()
+          .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
+          .max(10, { message: 'A senha deve ter no máximo 10 caracteres' })
+          .regex(/[!@#$%^&*(),.?":{}|<>]/, {
+            message: 'A senha deve conter pelo menos um caractere especial',
+          })
+          .refine((value) => /[a-zA-Z]/.test(value), {
+            message: 'A senha deve conter pelo menos uma letra',
+          }),
+      })
+      const { passwordResetToken, password, login } = resetPasswordSchema.parse(
+        request.body,
+      )
 
-    // Encontre o usuário associado ao token de recuperação
-    const user = await prisma.userIgreja.findUnique({
-      where: { login },
-    })
+      const user = await prisma.userIgreja.findUnique({
+        where: { login },
+      })
 
-    if (!user) {
-      return { error: 'Usuário não encontrado' }
+      if (!user) {
+        return { error: 'Usuário não encontrado' }
+      }
+
+      if (
+        user.passwordResetToken !== passwordResetToken ||
+        !user.expires ||
+        user.expires < new Date()
+      ) {
+        return { error: 'Token inválido ou expirado' }
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10)
+      await prisma.userIgreja.update({
+        where: { login },
+        data: {
+          password: hashedPassword,
+          passwordResetToken,
+        },
+      })
+
+      reply.send({ message: 'Senha redefinida com sucesso' })
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const firstError = error.errors[0]
+        reply.status(400).send({ error: firstError.message })
+      } else {
+        reply.status(500).send({ error: 'Erro interno do servidor' })
+      }
     }
-
-    if (
-      user.passwordResetToken !== passwordResetToken ||
-      !user.expires ||
-      user.expires < new Date()
-    ) {
-      return { error: 'Token inválido ou expirado' }
-    }
-
-    // Hash a nova senha e atualize no banco de dados
-    const hashedPassword = await bcrypt.hash(password, 10)
-    await prisma.userIgreja.update({
-      where: { login },
-      data: {
-        password: hashedPassword,
-        passwordResetToken,
-      },
-    })
-
-    reply.send({ message: 'Senha redefinida com sucesso' })
   })
 
   app.post('/register/igreja', async (request) => {
