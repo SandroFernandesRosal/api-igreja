@@ -42,7 +42,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     return user
   })
 
-  app.post('/login/igreja', async (request) => {
+  app.post('/login/igreja', async (request, reply) => {
     const userSchema = z.object({
       login: z.string(),
       password: z.string(),
@@ -69,6 +69,13 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
           expiresIn: '30d',
         },
       )
+
+      reply.setCookie('tokenigreja', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60, // 30 dias
+      })
 
       return { user, token }
     } catch (error) {
@@ -187,6 +194,26 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         },
       })
 
+      const token = app.jwt.sign(
+        {
+          id: user.id,
+          name: user.name,
+          avatarUrl: user.avatarUrl,
+          login: user.login,
+        },
+        {
+          sub: user.id,
+          expiresIn: '30d',
+        },
+      )
+
+      reply.setCookie('tokenigreja', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60, // 30 dias
+      })
+
       reply.send({ message: 'Senha redefinida com sucesso' })
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -198,7 +225,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     }
   })
 
-  app.post('/register/igreja', async (request) => {
+  app.post('/register/igreja', async (request, reply) => {
     const userSchema = z.object({
       login: z.string().email({ message: 'Email inválido' }),
       name: z.string(),
@@ -259,6 +286,13 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
           expiresIn: '30d',
         },
       )
+
+      reply.setCookie('tokenigreja', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60, // 30 dias
+      })
 
       return { user, token, refreshToken }
     } catch (error) {
