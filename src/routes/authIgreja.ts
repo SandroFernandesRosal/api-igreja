@@ -325,6 +325,13 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         },
       )
 
+      reply.setCookie('tokenigreja', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60, // 30 dias
+      })
+
       return { user, token }
     } catch (error) {
       if (error instanceof z.ZodError) {

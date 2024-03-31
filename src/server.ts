@@ -3,6 +3,7 @@ import 'dotenv/config'
 import fastify from 'fastify'
 import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
+import fastifyCookie from '@fastify/cookie'
 import multipart from '@fastify/multipart'
 import { memoriesRoutes } from './routes/vp/news'
 import { authRoutes } from './routes/auth'
@@ -40,6 +41,8 @@ app.register(cors, {
 app.register(jwt, {
   secret: 'alcancadospelagraca',
 })
+
+app.register(fastifyCookie)
 
 app.register(authRoutes)
 app.register(authIgrejaRoutes)
