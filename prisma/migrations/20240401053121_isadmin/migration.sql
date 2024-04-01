@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "isAdmin" BOOLEAN NOT NULL DEFAULT false;
+
+-- AlterTable
+ALTER TABLE "UserIgreja" ALTER COLUMN "name" DROP NOT NULL,
+ALTER COLUMN "avatarUrl" DROP NOT NULL;
