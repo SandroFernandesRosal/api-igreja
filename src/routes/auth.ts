@@ -150,6 +150,7 @@ export async function authRoutes(app: FastifyInstance) {
           name,
           avatarUrl,
           password: senhaCriptografada,
+          isAdmin: true,
         },
       })
 
