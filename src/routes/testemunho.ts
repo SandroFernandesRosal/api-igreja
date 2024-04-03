@@ -114,7 +114,7 @@ export async function testemunhoRoutes(app: FastifyInstance) {
       where: { id },
     })
 
-    const isAdmin = await prisma.user.findUniqueOrThrow({
+    const isAdmin = await prisma.user.findUnique({
       where: { id },
     })
 
