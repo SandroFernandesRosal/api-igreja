@@ -61,18 +61,6 @@ export async function testemunhoRoutes(app: FastifyInstance) {
   app.put('/testemunhos/:id', async (request, reply) => {
     await request.jwtVerify()
 
-    const user = await prisma.user.findUnique({
-      where: { id: request.user.sub },
-    })
-
-    if (!user || !user.isAdmin) {
-      reply.code(403).send({
-        error:
-          'Acesso negado. Somente administradores podem editar testemunhos.',
-      })
-      return
-    }
-
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
@@ -114,22 +102,6 @@ export async function testemunhoRoutes(app: FastifyInstance) {
 
   app.delete('/testemunhos/:id', async (request, reply) => {
     await request.jwtVerify()
-
-    const userAdm = await prisma.user.findUnique({
-      where: { id: request.user.id },
-    })
-
-    const userIgreja = await prisma.userIgreja.findUnique({
-      where: { id: request.user.id },
-    })
-
-    if (!userAdm || !userAdm.isAdmin || !userIgreja) {
-      reply.code(403).send({
-        error:
-          'Acesso negado. Somente administradores podem apagar testemunhos.',
-      })
-      return
-    }
 
     const paramsSchema = z.object({
       id: z.string().uuid(),
