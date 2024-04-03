@@ -9,6 +9,7 @@ declare module '@fastify/jwt' {
       avatarUrl: string
       password: string
       login: string
+      isAdmin: boolean
     }
   }
 }
