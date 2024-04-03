@@ -4,13 +4,13 @@ import { prisma } from '../lib/prisma'
 
 export async function testemunhoRoutes(app: FastifyInstance) {
   app.get('/testemunhos', async (request) => {
-    const memories = await prisma.testemunho.findMany({
+    const testemunhos = await prisma.testemunho.findMany({
       orderBy: {
         createdAt: 'desc',
       },
     })
 
-    return memories
+    return testemunhos
   })
 
   app.get('/testemunhos/:id', async (request, reply) => {
@@ -20,13 +20,13 @@ export async function testemunhoRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    const memory = await prisma.testemunho.findUniqueOrThrow({
+    const testemunho = await prisma.testemunho.findUniqueOrThrow({
       where: {
         id,
       },
     })
 
-    return memory
+    return testemunho
   })
 
   app.post('/testemunhos', async (request) => {
@@ -44,7 +44,7 @@ export async function testemunhoRoutes(app: FastifyInstance) {
       request.body,
     )
 
-    const memory = await prisma.testemunho.create({
+    const testemunho = await prisma.testemunho.create({
       data: {
         name,
         coverUrl,
@@ -55,7 +55,7 @@ export async function testemunhoRoutes(app: FastifyInstance) {
       },
     })
 
-    return memory
+    return testemunho
   })
 
   app.put('/testemunhos/:id', async (request, reply) => {
