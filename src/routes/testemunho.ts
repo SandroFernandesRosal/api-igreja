@@ -103,37 +103,32 @@ export async function testemunhoRoutes(app: FastifyInstance) {
   app.delete('/testemunhos/:id', async (request, reply) => {
     await request.jwtVerify()
 
-    const userId = request.user.id // Assumindo que você tem o ID do usuário disponível aqui
-    const isAdmin = request.user.isAdmin // E se ele é admin
-
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
 
-    const testemunho = await prisma.testemunho.findUnique({
+    const user = await prisma.user.findUnique({
+      where: { id },
+    })
+
+    const userIgreja = await prisma.userIgreja.findUnique({
+      where: { id },
+    })
+
+    await prisma.testemunho.findUniqueOrThrow({
       where: {
         id,
       },
     })
 
-    if (!testemunho) {
-      return reply.status(404).send({ error: 'Testemunho não encontrado.' })
-    }
-
-    // Verifica se o usuário é admin ou é o criador do testemunho
-    if (isAdmin || testemunho.userId === userId) {
+    if (userIgreja || user) {
       await prisma.testemunho.delete({
         where: {
           id,
         },
       })
-      reply.status(200).send({ message: 'Testemunho deletado com sucesso.' })
-    } else {
-      reply
-        .status(403)
-        .send({ error: 'Você não tem permissão para deletar este testemunho.' })
     }
   })
 }
