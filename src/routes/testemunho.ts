@@ -92,7 +92,7 @@ export async function testemunhoRoutes(app: FastifyInstance) {
     const isCreator = request.user.sub === testemunho.userId
 
     if (isAdmin || isCreator) {
-      await prisma.testemunho.update({
+      return await prisma.testemunho.update({
         where: {
           id,
         },
@@ -109,7 +109,6 @@ export async function testemunhoRoutes(app: FastifyInstance) {
         message: 'Você não tem permissão para deletar este testemunho.',
       })
     }
-    return testemunho
   })
 
   app.delete('/testemunhos/:id', async (request, reply) => {
