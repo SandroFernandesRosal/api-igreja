@@ -103,34 +103,29 @@ export async function testemunhoRoutes(app: FastifyInstance) {
   app.delete('/testemunhos/:id', async (request, reply) => {
     await request.jwtVerify()
 
-    const paramsSchema = z.object({
-      id: z.string().uuid(),
+    const { id } = z
+      .object({
+        id: z.string().uuid(),
+      })
+      .parse(request.params)
+
+    // Encontre o testemunho para obter o userId relacionado a ele
+    const testemunho = await prisma.testemunho.findUniqueOrThrow({
+      where: { id },
     })
 
-    const { id } = paramsSchema.parse(request.params)
+    // Verifica se o usuário é um administrador ou o criador do testemunho
+    const isAdmin = request.user.isAdmin // Isso deve ser determinado pelo seu sistema de autenticação
+    const isCreator = request.user.sub === testemunho.userId
 
-    const user = await prisma.user.findUnique({
-      where: { id: request.user.sub },
-    })
-
-    const userIgreja = await prisma.userIgreja.findUnique({
-      where: { id: request.user.sub },
-    })
-
-    await prisma.testemunho.findUniqueOrThrow({
-      where: {
-        id,
-      },
-    })
-
-    if (!userIgreja || !user) {
-      return null
+    // Se o usuário é administrador ou o criador do testemunho, permita a deleção
+    if (isAdmin || isCreator) {
+      await prisma.testemunho.delete({ where: { id } })
+      reply.send({ message: 'Testemunho deletado com sucesso.' })
+    } else {
+      reply.status(403).send({
+        message: 'Você não tem permissão para deletar este testemunho.',
+      })
     }
-
-    await prisma.testemunho.delete({
-      where: {
-        id,
-      },
-    })
   })
 }
