@@ -107,7 +107,6 @@ export async function testemunhoRoutes(app: FastifyInstance) {
         avatarUrl,
         content,
         isPublic,
-        userId: request.user.sub,
       },
     })
     return memory
@@ -120,7 +119,11 @@ export async function testemunhoRoutes(app: FastifyInstance) {
       where: { id: request.user.sub },
     })
 
-    if (!user || !user.isAdmin) {
+    const userIgreja = await prisma.userIgreja.findUnique({
+      where: { id: request.user.sub },
+    })
+
+    if (!user || !userIgreja) {
       reply.code(403).send({
         error:
           'Acesso negado. Somente administradores podem apagar testemunhos.',
