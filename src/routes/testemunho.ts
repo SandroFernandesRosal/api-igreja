@@ -114,8 +114,10 @@ export async function testemunhoRoutes(app: FastifyInstance) {
       where: { id },
     })
 
-    // Verifica se o usuário é um administrador ou o criador do testemunho
-    const isAdmin = request.user.isAdmin // Isso deve ser determinado pelo seu sistema de autenticação
+    const isAdmin = await prisma.user.findUniqueOrThrow({
+      where: { id },
+    })
+
     const isCreator = request.user.sub === testemunho.userId
 
     // Se o usuário é administrador ou o criador do testemunho, permita a deleção
