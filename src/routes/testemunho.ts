@@ -109,16 +109,41 @@ export async function testemunhoRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    await prisma.testemunho.findUniqueOrThrow({
-      where: {
-        id,
-      },
+    // Busca o usuário pelo ID do usuário autenticado
+    const user = await prisma.user.findUnique({
+      where: { id: request.user.id },
     })
 
+    // Busca o testemunho pelo ID fornecido
+    const testemunho = await prisma.testemunho.findUnique({
+      where: { id },
+      include: { userIgreja: true }, // Inclui o usuário que criou o testemunho
+    })
+
+    // Verifica se o testemunho existe
+    if (!testemunho) {
+      reply.code(404).send({
+        error: 'Testemunho não encontrado.',
+      })
+      return
+    }
+
+    // Verifica se o usuário é o autor do testemunho ou um administrador
+    if (!user || (!user.isAdmin && user.id !== testemunho.userIgreja.id)) {
+      reply.code(403).send({
+        error:
+          'Acesso negado. Somente o autor do testemunho ou administradores podem apagar testemunhos.',
+      })
+      return
+    }
+
+    // Lógica para deletar o testemunho
     await prisma.testemunho.delete({
       where: {
         id,
       },
     })
+
+    reply.send({ message: 'Testemunho deletado com sucesso.' })
   })
 }
