@@ -115,47 +115,38 @@ export async function testemunhoRoutes(app: FastifyInstance) {
   app.delete('/testemunhos/:id', async (request, reply) => {
     await request.jwtVerify()
 
+    const userAdm = await prisma.user.findUnique({
+      where: { id: request.user.sub },
+    })
+
+    const userIgreja = await prisma.userIgreja.findUnique({
+      where: { id: request.user.sub },
+    })
+
+    if (!userAdm || !userAdm.isAdmin || !userIgreja) {
+      reply.code(403).send({
+        error:
+          'Acesso negado. Somente administradores podem apagar testemunhos.',
+      })
+      return
+    }
+
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
 
-    // Busca o usuário pelo ID do usuário autenticado
-    const user = await prisma.user.findUnique({
-      where: { id: request.user.id },
-    })
-
-    // Busca o testemunho pelo ID fornecido
-    const testemunho = await prisma.testemunho.findUnique({
-      where: { id },
-      include: { userIgreja: true }, // Inclui o usuário que criou o testemunho
-    })
-
-    // Verifica se o testemunho existe
-    if (!testemunho) {
-      reply.code(404).send({
-        error: 'Testemunho não encontrado.',
-      })
-      return
-    }
-
-    // Verifica se o usuário é o autor do testemunho ou um administrador
-    if (!user || (!user.isAdmin && user.id !== testemunho.userIgreja.id)) {
-      reply.code(403).send({
-        error:
-          'Acesso negado. Somente o autor do testemunho ou administradores podem apagar testemunhos.',
-      })
-      return
-    }
-
-    // Lógica para deletar o testemunho
-    await prisma.testemunho.delete({
+    await prisma.testemunho.findUniqueOrThrow({
       where: {
         id,
       },
     })
 
-    reply.send({ message: 'Testemunho deletado com sucesso.' })
+    await prisma.testemunho.delete({
+      where: {
+        id,
+      },
+    })
   })
 }
