@@ -121,6 +121,22 @@ export async function testemunhoRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
+    const user = await prisma.user.findUnique({
+      where: { id },
+    })
+
+    const userIgreja = await prisma.userIgreja.findUnique({
+      where: { id },
+    })
+
+    if (!user || !userIgreja) {
+      reply.code(403).send({
+        error:
+          'Acesso negado. Somente administradores podem apagar testemunhos.',
+      })
+      return
+    }
+
     await prisma.testemunho.findUniqueOrThrow({
       where: {
         id,
