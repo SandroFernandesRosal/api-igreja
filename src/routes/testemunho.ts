@@ -123,12 +123,14 @@ export async function testemunhoRoutes(app: FastifyInstance) {
       },
     })
 
-    if (userIgreja || user) {
-      await prisma.testemunho.delete({
-        where: {
-          id,
-        },
-      })
+    if (!userIgreja || !user) {
+      return null
     }
+
+    await prisma.testemunho.delete({
+      where: {
+        id,
+      },
+    })
   })
 }
