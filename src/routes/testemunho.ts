@@ -116,11 +116,11 @@ export async function testemunhoRoutes(app: FastifyInstance) {
     await request.jwtVerify()
 
     const userAdm = await prisma.user.findUnique({
-      where: { id: request.user.sub },
+      where: { id: request.user.id },
     })
 
     const userIgreja = await prisma.userIgreja.findUnique({
-      where: { id: request.user.sub },
+      where: { id: request.user.id },
     })
 
     if (!userAdm || !userAdm.isAdmin || !userIgreja) {
