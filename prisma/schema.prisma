@@ -10,10 +10,12 @@ datasource db {
 model User {
   id                  String                @id @default(uuid())
   login               String                @unique
-  name                String
-  avatarUrl           String
+  name                String?
+  avatarUrl           String?
   password            String
   isAdmin             Boolean               @default(false)
+  passwordResetToken  String?
+  expires             DateTime?
   agenda              Agenda[]
   agendacaxias        AgendaCaxias[]
   agendatomazinho     AgendaTomazinho[]
@@ -29,6 +31,7 @@ model User {
   sobre               Sobre[]
   sobreLider          SobreLider[]
   refreshToken        RefreshToken[]
+  PasswordResetToken PasswordResetToken[]
 }
 
 model UserIgreja {
@@ -260,6 +263,15 @@ model PasswordResetTokenIgreja {
  token       String   @unique
  userId      String
  userIgreja      UserIgreja     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ createdAt   DateTime @default(now())
+ expiresAt   DateTime
+}
+
+model PasswordResetToken {
+ id          String      @id @default(uuid())
+ token       String   @unique
+ userId      String
+ user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
  createdAt   DateTime @default(now())
  expiresAt   DateTime
 }
