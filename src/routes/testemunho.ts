@@ -122,11 +122,11 @@ export async function testemunhoRoutes(app: FastifyInstance) {
     const { id } = paramsSchema.parse(request.params)
 
     const user = await prisma.user.findUnique({
-      where: { id },
+      where: { id: request.user.id },
     })
 
     const userIgreja = await prisma.userIgreja.findUnique({
-      where: { id },
+      where: { id: request.user.id },
     })
 
     if (!user || !userIgreja) {
