@@ -92,7 +92,7 @@ export async function testemunhoRoutes(app: FastifyInstance) {
     const isCreator = request.user.sub === testemunho.userId
 
     if (isAdmin || isCreator) {
-      return await prisma.testemunho.update({
+      await prisma.testemunho.update({
         where: {
           id,
         },
