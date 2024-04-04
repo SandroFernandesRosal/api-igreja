@@ -253,7 +253,7 @@ model RefreshTokenIgreja {
  id        String   @id @default(uuid())
  token     String   @unique
  userId    String
-userIgreja      UserIgreja     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ userIgreja      UserIgreja     @relation(fields: [userId], references: [id], onDelete: Cascade)
  createdAt DateTime @default(now())
  updatedAt DateTime @updatedAt
 }

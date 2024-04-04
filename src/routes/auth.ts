@@ -266,12 +266,21 @@ export async function authRoutes(app: FastifyInstance) {
     }
   })
 
-  app.post('/register', async (request) => {
+  app.post('/register', async (request, reply) => {
     const userSchema = z.object({
-      login: z.string(),
+      login: z.string().email({ message: 'Email inválido' }),
       name: z.string(),
       avatarUrl: z.string().url(),
-      password: z.string(),
+      password: z
+        .string()
+        .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
+        .max(10, { message: 'A senha deve ter no máximo 10 caracteres' })
+        .regex(/[!@#$%^&*(),.?":{}|<>]/, {
+          message: 'A senha deve conter pelo menos um caractere especial',
+        })
+        .refine((value) => /[a-zA-Z]/.test(value), {
+          message: 'A senha deve conter pelo menos uma letra',
+        }),
     })
 
     try {
@@ -297,7 +306,6 @@ export async function authRoutes(app: FastifyInstance) {
           name,
           avatarUrl,
           password: senhaCriptografada,
-          isAdmin: true,
         },
       })
 
@@ -313,6 +321,7 @@ export async function authRoutes(app: FastifyInstance) {
           name: user.name,
           avatarUrl: user.avatarUrl,
           login: user.login,
+          id: user.id,
         },
         {
           sub: user.id,
@@ -320,10 +329,23 @@ export async function authRoutes(app: FastifyInstance) {
         },
       )
 
+      reply.setCookie('tokennn', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 30 * 24 * 60 * 60, // 30 dias
+      })
+
       return { user, token, refreshToken }
     } catch (error) {
-      console.error(error)
-      return { error: 'Erro ao criar usuário' }
+      if (error instanceof z.ZodError) {
+        const erro = error.issues[0].message
+        console.error(erro)
+
+        return { erro }
+      } else {
+        console.error(error)
+      }
     }
   })
 
@@ -363,12 +385,21 @@ export async function authRoutes(app: FastifyInstance) {
         name: user.name,
         avatarUrl: user.avatarUrl,
         login: user.login,
+        id: user.id,
+        isAdmin: user.isAdmin,
       },
       {
         sub: user.id,
         expiresIn: '30d',
       },
     )
+
+    reply.setCookie('tokennn', token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60, // 30 dias
+    })
 
     return { user, token }
   })

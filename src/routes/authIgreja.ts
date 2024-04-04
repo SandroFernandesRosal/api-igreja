@@ -100,6 +100,39 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     return isPasswordValid ? user : false
   }
 
+  app.post('/refresh-token-igreja', async (request, reply) => {
+    const refreshTokenSchema = z.object({
+      refreshToken: z.string(),
+    })
+
+    const { refreshToken } = refreshTokenSchema.parse(request.body)
+
+    const refreshTokenRecord = await prisma.refreshTokenIgreja.findUnique({
+      where: { token: refreshToken },
+      include: { userIgreja: true },
+    })
+
+    if (!refreshTokenRecord) {
+      return { error: 'Refresh token inválido.' }
+    }
+
+    const user = refreshTokenRecord.userIgreja
+
+    const newToken = app.jwt.sign(
+      {
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        login: user.login,
+      },
+      {
+        sub: user.id,
+        expiresIn: '30d',
+      },
+    )
+
+    return { token: newToken }
+  })
+
   app.post('/recover-password', async (request, reply) => {
     const userSchema = z.object({
       login: z.string().email({ message: 'Email inválido' }),
@@ -352,6 +385,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
           name: user.name,
           avatarUrl: user.avatarUrl,
           login: user.login,
+          id: user.id,
         },
         {
           sub: user.id,
