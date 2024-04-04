@@ -132,7 +132,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       to: login,
       subject: 'Recuperação de Senha',
       text: `Para redefinir sua senha, clique no link abaixo:
-      https://alcancadospelagraca.vercel.app/reset-password-adm/${token}
+      https://alcancadospelagraca.vercel.app/reset-password/${token}
        Este link expira em 1 hora.`,
     }
 
