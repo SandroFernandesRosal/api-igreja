@@ -4,17 +4,17 @@ import { prisma } from '../../lib/prisma'
 
 export async function memoriesRoutes(app: FastifyInstance) {
   app.get('/news/viladapenha', async (request) => {
-    // Use uma asserção de tipo para informar ao TypeScript que request.query é um objeto com uma propriedade 'page'
-    const pageQuery = (request.query as { page?: string }).page
-    // Converte a string para um número, usando 1 como valor padrão se 'page' não estiver definido
-    const page = pageQuery ? parseInt(pageQuery, 10) : 1
+    // Use uma asserção de tipo para informar ao TypeScript que request.query é um objeto com uma propriedade 'offset' que é uma string
+    const offsetQuery = (request.query as { offset?: string }).offset
+    // Converte a string para um número, usando 0 como valor padrão se 'offset' não estiver definido
+    const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
     const itemsPerPage = 4
 
     const memories = await prisma.new.findMany({
       orderBy: {
         createdAt: 'desc',
       },
-      skip: (page - 1) * itemsPerPage,
+      skip: offset,
       take: itemsPerPage,
     })
 
