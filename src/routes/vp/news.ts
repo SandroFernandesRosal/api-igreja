@@ -4,18 +4,17 @@ import { prisma } from '../../lib/prisma'
 
 export async function memoriesRoutes(app: FastifyInstance) {
   app.get('/news/viladapenha', async (request) => {
-    const paramsSchema = z.object({
-      skip: z.number(),
-      take: z.number(),
-    })
-    const { skip = 4, take = 4 } = paramsSchema.parse(request.query)
+    const offsetQuery = (request.query as { offset?: string }).offset
+
+    const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
+    const itemsPerPage = 4
 
     const memories = await prisma.new.findMany({
       orderBy: {
         createdAt: 'desc',
       },
-      skip,
-      take,
+      skip: offset,
+      take: itemsPerPage,
     })
 
     return memories
