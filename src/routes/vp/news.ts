@@ -9,6 +9,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
         createdAt: 'desc',
       },
       take: 4,
+      skip: 4,
     })
 
     return memories
