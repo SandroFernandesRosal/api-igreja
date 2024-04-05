@@ -3,24 +3,15 @@ import { z } from 'zod'
 import { prisma } from '../../lib/prisma'
 
 export async function memoriesRoutes(app: FastifyInstance) {
-  app.get('/news/viladapenha', async (request, response) => {
-    const page = parseInt((request.query as { page?: string }).page || '1')
-    const pageSize = 4
-
+  app.get('/news/viladapenha', async (request) => {
     const memories = await prisma.new.findMany({
       orderBy: {
         createdAt: 'desc',
       },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      take: 4,
     })
 
-    const totalMemories = await prisma.new.count()
-
-    return {
-      memories,
-      totalPages: Math.ceil(totalMemories / pageSize),
-    }
+    return memories
   })
 
   app.get('/news/viladapenha/:id', async (request, reply) => {
