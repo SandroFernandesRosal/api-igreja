@@ -5,12 +5,12 @@ import { prisma } from '../../lib/prisma'
 export async function memoriesRoutes(app: FastifyInstance) {
   app.get('/news/viladapenha', async (request) => {
     const tamanho = 4
-    const pagina = 1
+
     const memories = await prisma.new.findMany({
       orderBy: {
         createdAt: 'desc',
       },
-      skip: (pagina - 1) * tamanho,
+
       take: tamanho,
     })
 
