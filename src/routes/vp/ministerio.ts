@@ -4,13 +4,20 @@ import { prisma } from '../../lib/prisma'
 
 export async function ministerioRoutes(app: FastifyInstance) {
   app.get('/ministerio/viladapenha', async (request) => {
-    const ministerios = await prisma.ministerio.findMany({
+    const offsetQuery = (request.query as { offset?: string }).offset
+
+    const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
+    const itemsPerPage = 6
+
+    const ministerio = await prisma.ministerio.findMany({
       orderBy: {
         createdAt: 'desc',
       },
+      skip: offset,
+      take: itemsPerPage,
     })
 
-    return ministerios
+    return ministerio
   })
 
   app.get('/minsterio/viladapenha/:id', async (request, reply) => {

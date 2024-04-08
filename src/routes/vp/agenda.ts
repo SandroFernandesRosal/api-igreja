@@ -4,13 +4,20 @@ import { prisma } from '../../lib/prisma'
 
 export async function agendaRoutes(app: FastifyInstance) {
   app.get('/agenda/viladapenha', async (request) => {
-    const agendas = await prisma.agenda.findMany({
+    const offsetQuery = (request.query as { offset?: string }).offset
+
+    const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
+    const itemsPerPage = 6
+
+    const agenda = await prisma.agenda.findMany({
       orderBy: {
         createdAt: 'desc',
       },
+      skip: offset,
+      take: itemsPerPage,
     })
 
-    return agendas
+    return agenda
   })
 
   app.get('/agenda/viladapenha/:id', async (request, reply) => {
