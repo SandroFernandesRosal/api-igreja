@@ -4,13 +4,20 @@ import { prisma } from '../lib/prisma'
 
 export async function testemunhoRoutes(app: FastifyInstance) {
   app.get('/testemunhos', async (request) => {
-    const testemunhos = await prisma.testemunho.findMany({
+    const offsetQuery = (request.query as { offset?: string }).offset
+
+    const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
+    const itemsPerPage = 6
+
+    const testemunho = await prisma.testemunho.findMany({
       orderBy: {
         createdAt: 'desc',
       },
+      skip: offset,
+      take: itemsPerPage,
     })
 
-    return testemunhos
+    return testemunho
   })
 
   app.get('/testemunhos/:id', async (request, reply) => {
