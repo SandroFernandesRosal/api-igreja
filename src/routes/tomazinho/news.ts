@@ -9,7 +9,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
     const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
     const itemsPerPage = 6
 
-    const memories = await prisma.newTomazinho.findMany({
+    const news = await prisma.newTomazinho.findMany({
       orderBy: {
         createdAt: 'desc',
       },
@@ -17,7 +17,13 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    return memories
+    const newsTotal = await prisma.newTomazinho.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    return { news, newsTotal }
   })
 
   app.get('/news/tomazinho/:id', async (request, reply) => {

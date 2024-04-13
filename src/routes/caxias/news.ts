@@ -9,7 +9,7 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
     const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
     const itemsPerPage = 6
 
-    const memories = await prisma.newCaxias.findMany({
+    const news = await prisma.newCaxias.findMany({
       orderBy: {
         createdAt: 'desc',
       },
@@ -17,7 +17,13 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    return memories
+    const newsTotal = await prisma.newCaxias.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    return { news, newsTotal }
   })
 
   app.get('/news/caxias/:id', async (request, reply) => {

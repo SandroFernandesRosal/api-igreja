@@ -17,7 +17,13 @@ export async function ministerioRoutes(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    return ministerio
+    const ministerioTotal = await prisma.ministerio.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    return { ministerio, ministerioTotal }
   })
 
   app.get('/minsterio/viladapenha/:id', async (request, reply) => {
