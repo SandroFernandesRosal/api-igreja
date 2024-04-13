@@ -17,7 +17,13 @@ export async function testemunhoRoutes(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    return testemunho
+    const testemunhoTotal = await prisma.testemunho.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+
+    return { testemunho, testemunhoTotal }
   })
 
   app.get('/testemunhos/:id', async (request, reply) => {
