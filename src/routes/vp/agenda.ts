@@ -49,9 +49,12 @@ export async function agendaRoutes(app: FastifyInstance) {
       day: z.string(),
       hour: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      destaque: z.coerce.boolean().default(false),
     })
 
-    const { name, day, isPublic, hour } = bodySchema.parse(request.body)
+    const { name, day, isPublic, hour, destaque } = bodySchema.parse(
+      request.body,
+    )
 
     const agenda = await prisma.agenda.create({
       data: {
@@ -60,6 +63,7 @@ export async function agendaRoutes(app: FastifyInstance) {
         hour,
         isPublic,
         userId: request.user.sub,
+        destaque,
       },
     })
 
@@ -80,9 +84,12 @@ export async function agendaRoutes(app: FastifyInstance) {
       day: z.string(),
       hour: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      destaque: z.coerce.boolean().default(false),
     })
 
-    const { name, day, isPublic, hour } = bodySchema.parse(request.body)
+    const { name, day, isPublic, hour, destaque } = bodySchema.parse(
+      request.body,
+    )
 
     let agenda = await prisma.agenda.findUniqueOrThrow({
       where: {
@@ -99,6 +106,7 @@ export async function agendaRoutes(app: FastifyInstance) {
         day,
         hour,
         isPublic,
+        destaque,
       },
     })
 

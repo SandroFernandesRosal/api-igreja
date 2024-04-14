@@ -82,6 +82,7 @@ model Agenda {
   name      String
   hour      String
   isPublic  Boolean  @default(true)
+  destaque Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -121,6 +122,7 @@ model AgendaTomazinho {
   name      String
   hour      String
   isPublic  Boolean  @default(true)
+  destaque Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -160,6 +162,7 @@ model AgendaCaxias {
   name      String
   hour      String
   isPublic  Boolean  @default(true)
+  destaque Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
