@@ -62,7 +62,6 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
 
       return memories
     } catch (error) {
-      // Trate o erro de maneira apropriada, como retornar um código de erro HTTP 500
       return { error: 'Internal Server Error' }
     }
   })
@@ -75,12 +74,12 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
       coverUrl: z.string(),
       title: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      destaque: z.coerce.boolean().default(false),
       page: z.string(),
     })
 
-    const { content, coverUrl, isPublic, title, page } = bodySchema.parse(
-      request.body,
-    )
+    const { content, coverUrl, isPublic, title, page, destaque } =
+      bodySchema.parse(request.body)
 
     const memory = await prisma.newTomazinho.create({
       data: {
@@ -90,6 +89,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
         isPublic,
         userId: request.user.sub,
         page,
+        destaque,
       },
     })
 
@@ -110,12 +110,12 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
       coverUrl: z.string(),
       title: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      destaque: z.coerce.boolean().default(false),
       page: z.string(),
     })
 
-    const { content, coverUrl, isPublic, title, page } = bodySchema.parse(
-      request.body,
-    )
+    const { content, coverUrl, isPublic, title, page, destaque } =
+      bodySchema.parse(request.body)
 
     let memory = await prisma.newTomazinho.findUniqueOrThrow({
       where: {
@@ -132,6 +132,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
         coverUrl,
         title,
         isPublic,
+        destaque,
         page,
       },
     })

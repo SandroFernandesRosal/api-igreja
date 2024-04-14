@@ -75,12 +75,12 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
       coverUrl: z.string(),
       title: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      destaque: z.coerce.boolean().default(false),
       page: z.string(),
     })
 
-    const { content, coverUrl, isPublic, title, page } = bodySchema.parse(
-      request.body,
-    )
+    const { content, coverUrl, isPublic, title, page, destaque } =
+      bodySchema.parse(request.body)
 
     const memory = await prisma.newCaxias.create({
       data: {
@@ -90,6 +90,7 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
         isPublic,
         userId: request.user.sub,
         page,
+        destaque,
       },
     })
 
@@ -110,12 +111,12 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
       coverUrl: z.string(),
       title: z.string(),
       isPublic: z.coerce.boolean().default(false),
+      destaque: z.coerce.boolean().default(false),
       page: z.string(),
     })
 
-    const { content, coverUrl, isPublic, title, page } = bodySchema.parse(
-      request.body,
-    )
+    const { content, coverUrl, isPublic, title, page, destaque } =
+      bodySchema.parse(request.body)
 
     let memory = await prisma.newCaxias.findUniqueOrThrow({
       where: {
@@ -133,6 +134,7 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
         title,
         isPublic,
         page,
+        destaque,
       },
     })
 
