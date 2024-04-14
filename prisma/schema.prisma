@@ -56,6 +56,7 @@ model New {
   title     String
   createdAt DateTime @default(now())
   isPublic  Boolean  @default(true)
+  destaque Boolean  @default(false)
   page      String
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -94,6 +95,7 @@ model NewTomazinho {
   title     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  destaque Boolean  @default(false)
   page      String
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -132,6 +134,7 @@ model NewCaxias {
   title     String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
+  destaque Boolean  @default(false)
   page      String
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
