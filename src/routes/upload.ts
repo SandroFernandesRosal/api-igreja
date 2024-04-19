@@ -63,4 +63,50 @@ export async function uploadRoutes(app: FastifyInstance) {
 
     return { fileUrl }
   })
+
+  app.post('/upload/sobre', async (request, reply) => {
+    const upload = await request.file({
+      limits: {
+        fileSize: 50_000_000, //   50mb
+      },
+    })
+
+    if (!upload) {
+      return reply.status(400).send()
+    }
+
+    const mimeTypeRegex = /^(image|video)\/[a-zA-Z]+/
+    const isValidFileFormat = mimeTypeRegex.test(upload.mimetype)
+
+    if (!isValidFileFormat) {
+      return reply.status(400).send()
+    }
+
+    const fileId = randomUUID()
+    const extension = extname(upload.filename)
+    const fileName = fileId.concat(extension)
+
+    // Crie um objeto Drive
+    const drive = google.drive({ version: 'v3', auth: oauth2Client })
+
+    // Crie um arquivo no Google Drive
+    const fileMetadata = {
+      name: fileName,
+      parents: [GOOGLE_API_FOLDER_ID],
+    }
+    const media = {
+      mimeType: upload.mimetype,
+      body: upload.file,
+    }
+    const response = await drive.files.create({
+      requestBody: fileMetadata,
+      media,
+      fields: 'id',
+    })
+
+    // Obtenha a URL do arquivo
+    const fileUrl = `https://drive.google.com/uc?export=view&id=${response.data.id}`
+
+    return { fileUrl }
+  })
 }
