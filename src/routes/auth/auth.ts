@@ -1,7 +1,6 @@
-import 'dotenv/config'
 import { FastifyInstance } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '../lib/prisma'
+import { prisma } from '../../lib/prisma'
 import bcrypt from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -19,21 +18,21 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-export async function authIgrejaRoutes(app: FastifyInstance) {
-  app.get('/register/igreja', async (request) => {
-    const users = await prisma.userIgreja.findMany()
+export async function authRoutes(app: FastifyInstance) {
+  app.get('/register', async (request) => {
+    const users = await prisma.user.findMany()
 
     return users
   })
 
-  app.get('/register/igreja/:id', async (request) => {
+  app.get('/register/:id', async (request) => {
     const paramsSchema = z.object({
       id: z.string().uuid(),
     })
 
     const { id } = paramsSchema.parse(request.params)
 
-    const user = await prisma.userIgreja.findUniqueOrThrow({
+    const user = await prisma.user.findUniqueOrThrow({
       where: {
         id,
       },
@@ -42,7 +41,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     return user
   })
 
-  app.post('/login/igreja', async (request, reply) => {
+  app.post('/login', async (request, reply) => {
     const userSchema = z.object({
       login: z.string(),
       password: z.string(),
@@ -57,12 +56,21 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         return { error: 'Credenciais inválidas.' }
       }
 
+      const refreshToken = uuidv4()
+
+      await prisma.refreshToken.create({
+        data: {
+          token: refreshToken,
+          userId: user.id,
+        },
+      })
+
       const token = app.jwt.sign(
         {
-          id: user.id,
           name: user.name,
           avatarUrl: user.avatarUrl,
           login: user.login,
+          id: user.id,
         },
         {
           sub: user.id,
@@ -77,7 +85,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         maxAge: 30 * 24 * 60 * 60, // 30 dias
       })
 
-      return { user, token }
+      return { user, token, refreshToken }
     } catch (error) {
       console.error(error)
       return { error: 'Erro na autenticação' }
@@ -85,7 +93,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
   })
 
   async function authenticateUser(login: string, password: any) {
-    const user = await prisma.userIgreja.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         login,
       },
@@ -100,23 +108,23 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     return isPasswordValid ? user : false
   }
 
-  app.post('/refresh-token-igreja', async (request, reply) => {
+  app.post('/refresh-token', async (request, reply) => {
     const refreshTokenSchema = z.object({
       refreshToken: z.string(),
     })
 
     const { refreshToken } = refreshTokenSchema.parse(request.body)
 
-    const refreshTokenRecord = await prisma.refreshTokenIgreja.findUnique({
+    const refreshTokenRecord = await prisma.refreshToken.findUnique({
       where: { token: refreshToken },
-      include: { userIgreja: true },
+      include: { user: true },
     })
 
     if (!refreshTokenRecord) {
       return { error: 'Refresh token inválido.' }
     }
 
-    const user = refreshTokenRecord.userIgreja
+    const user = refreshTokenRecord.user
 
     const newToken = app.jwt.sign(
       {
@@ -133,14 +141,14 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     return { token: newToken }
   })
 
-  app.post('/recover-password', async (request, reply) => {
+  app.post('/recover-password-adm', async (request, reply) => {
     const userSchema = z.object({
       login: z.string().email({ message: 'Email inválido' }),
     })
     const { login } = userSchema.parse(request.body)
 
     // Verifique se o e-mail existe no banco de dados
-    const user = await prisma.userIgreja.findUnique({
+    const user = await prisma.user.findUnique({
       where: { login },
     })
 
@@ -152,7 +160,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     const token = uuidv4()
 
     // Armazene o token no banco de dados (exemplo simplificado)
-    await prisma.userIgreja.update({
+    await prisma.user.update({
       data: {
         passwordResetToken: token,
         expires: new Date(Date.now() + 3600000), // Expira em 1 hora
@@ -165,7 +173,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       to: login,
       subject: 'Recuperação de Senha',
       text: `Para redefinir sua senha, clique no link abaixo:
-      https://alcancadospelagraca.vercel.app/reset-password/${token}
+      https://alcancadospelagraca.vercel.app/reset-password-adm/${token}
        Este link expira em 1 hora.`,
     }
 
@@ -182,7 +190,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     })
   })
 
-  app.post('/reset-password', async (request, reply) => {
+  app.post('/reset-password-adm', async (request, reply) => {
     try {
       const resetPasswordSchema = z.object({
         passwordResetToken: z.string(),
@@ -202,7 +210,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         request.body,
       )
 
-      const user = await prisma.userIgreja.findUnique({
+      const user = await prisma.user.findUnique({
         where: { login },
       })
 
@@ -219,7 +227,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       }
 
       const hashedPassword = await bcrypt.hash(password, 10)
-      await prisma.userIgreja.update({
+      await prisma.user.update({
         where: { login },
         data: {
           password: hashedPassword,
@@ -240,7 +248,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         },
       )
 
-      reply.setCookie('tokenigreja', token, {
+      reply.setCookie('tokennn', token, {
         httpOnly: true,
         sameSite: 'strict',
         path: '/',
@@ -258,7 +266,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     }
   })
 
-  app.post('/register/igreja', async (request, reply) => {
+  app.post('/register', async (request, reply) => {
     const userSchema = z.object({
       login: z.string().email({ message: 'Email inválido' }),
       name: z.string(),
@@ -280,7 +288,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         request.body,
       )
 
-      const existingUser = await prisma.userIgreja.findUnique({
+      const existingUser = await prisma.user.findUnique({
         where: { login },
       })
 
@@ -292,7 +300,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
 
       const refreshToken = uuidv4()
 
-      const user = await prisma.userIgreja.create({
+      const user = await prisma.user.create({
         data: {
           login,
           name,
@@ -301,7 +309,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         },
       })
 
-      await prisma.refreshTokenIgreja.create({
+      await prisma.refreshToken.create({
         data: {
           token: refreshToken,
           userId: user.id,
@@ -313,6 +321,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
           name: user.name,
           avatarUrl: user.avatarUrl,
           login: user.login,
+          id: user.id,
         },
         {
           sub: user.id,
@@ -320,7 +329,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
         },
       )
 
-      reply.setCookie('tokenigreja', token, {
+      reply.setCookie('tokennn', token, {
         httpOnly: true,
         sameSite: 'strict',
         path: '/',
@@ -340,7 +349,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     }
   })
 
-  app.put('/register/igreja/:id', async (request, reply) => {
+  app.put('/register/:id', async (request, reply) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
@@ -351,69 +360,51 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
 
     const bodySchema = z.object({
       name: z.string(),
+
       avatarUrl: z.string(),
-      password: z
-        .string()
-        .min(8, { message: 'A senha deve ter pelo menos 8 caracteres' })
-        .max(10, { message: 'A senha deve ter no máximo 10 caracteres' })
-        .regex(/[!@#$%^&*(),.?":{}|<>]/, {
-          message: 'A senha deve conter pelo menos um caractere especial',
-        })
-        .refine((value) => /[a-zA-Z]/.test(value), {
-          message: 'A senha deve conter pelo menos uma letra',
-        }),
+      password: z.string(),
     })
 
-    try {
-      const { name, avatarUrl, password } = bodySchema.parse(request.body)
+    const { name, avatarUrl, password } = bodySchema.parse(request.body)
 
-      const senhaCriptografada = await bcrypt.hash(password, 10)
+    const senhaCriptografada = await bcrypt.hash(password, 10)
 
-      const user = await prisma.userIgreja.update({
-        where: {
-          id,
-        },
-        data: {
-          name,
-          avatarUrl,
-          password: senhaCriptografada,
-        },
-      })
+    const user = await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+        avatarUrl,
+        password: senhaCriptografada,
+      },
+    })
 
-      const token = app.jwt.sign(
-        {
-          name: user.name,
-          avatarUrl: user.avatarUrl,
-          login: user.login,
-          id: user.id,
-        },
-        {
-          sub: user.id,
-          expiresIn: '30d',
-        },
-      )
+    const token = app.jwt.sign(
+      {
+        name: user.name,
+        avatarUrl: user.avatarUrl,
+        login: user.login,
+        id: user.id,
+        isAdmin: user.isAdmin,
+      },
+      {
+        sub: user.id,
+        expiresIn: '30d',
+      },
+    )
 
-      reply.setCookie('tokenigreja', token, {
-        httpOnly: true,
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 30 * 24 * 60 * 60, // 30 dias
-      })
+    reply.setCookie('tokennn', token, {
+      httpOnly: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 30 * 24 * 60 * 60, // 30 dias
+    })
 
-      return { user, token }
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const erro = error.issues[0].message
-        console.error(erro)
-
-        return { erro }
-      } else {
-        console.error(error)
-      }
-    }
+    return { user, token }
   })
 
-  app.delete('/register/igreja/:id', async (request) => {
+  app.delete('/register/:id', async (request) => {
     await request.jwtVerify()
 
     const paramsSchema = z.object({
@@ -422,7 +413,7 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
 
     const { id } = paramsSchema.parse(request.params)
 
-    await prisma.userIgreja.delete({
+    await prisma.user.delete({
       where: {
         id,
       },
