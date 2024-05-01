@@ -6,15 +6,14 @@ import { v4 as uuidv4 } from 'uuid'
 
 const nodemailer = require('nodemailer')
 
-// Configuração do transporte do Nodemailer para o Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',
   port: 587,
   secure: true,
   auth: {
-    user: 'apg.adm.viladapenha@gmail.com', // Substitua pelo seu e-mail do Gmail
-    pass: process.env.PASSWORD_GMAIL, // Substitua pela sua senha do Gmail
+    user: 'apg.adm.viladapenha@gmail.com',
+    pass: process.env.PASSWORD_GMAIL,
   },
 })
 
@@ -147,7 +146,6 @@ export async function authRoutes(app: FastifyInstance) {
     })
     const { login } = userSchema.parse(request.body)
 
-    // Verifique se o e-mail existe no banco de dados
     const user = await prisma.user.findUnique({
       where: { login },
     })
@@ -156,10 +154,8 @@ export async function authRoutes(app: FastifyInstance) {
       return { error: 'E-mail não encontrado' }
     }
 
-    // Gere um token de recuperação de senha
     const token = uuidv4()
 
-    // Armazene o token no banco de dados (exemplo simplificado)
     await prisma.user.update({
       data: {
         passwordResetToken: token,
@@ -339,12 +335,10 @@ export async function authRoutes(app: FastifyInstance) {
       return { user, token, refreshToken }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const erro = error.issues[0].message
-        console.error(erro)
-
-        return { erro }
+        const firstError = error.errors[0]
+        reply.status(400).send({ error: firstError.message })
       } else {
-        console.error(error)
+        reply.status(500).send({ error: 'Erro interno do servidor' })
       }
     }
   })

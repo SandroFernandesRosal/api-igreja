@@ -7,15 +7,14 @@ import { v4 as uuidv4 } from 'uuid'
 
 const nodemailer = require('nodemailer')
 
-// Configuração do transporte do Nodemailer para o Gmail
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',
   port: 587,
   secure: true,
   auth: {
-    user: 'apg.adm.viladapenha@gmail.com', // Substitua pelo seu e-mail do Gmail
-    pass: process.env.PASSWORD_GMAIL, // Substitua pela sua senha do Gmail
+    user: 'apg.adm.viladapenha@gmail.com',
+    pass: process.env.PASSWORD_GMAIL,
   },
 })
 
@@ -139,7 +138,6 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
     })
     const { login } = userSchema.parse(request.body)
 
-    // Verifique se o e-mail existe no banco de dados
     const user = await prisma.userIgreja.findUnique({
       where: { login },
     })
@@ -148,10 +146,8 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       return { error: 'E-mail não encontrado' }
     }
 
-    // Gere um token de recuperação de senha
     const token = uuidv4()
 
-    // Armazene o token no banco de dados (exemplo simplificado)
     await prisma.userIgreja.update({
       data: {
         passwordResetToken: token,
