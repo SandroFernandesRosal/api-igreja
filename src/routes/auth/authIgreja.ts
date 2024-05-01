@@ -330,12 +330,10 @@ export async function authIgrejaRoutes(app: FastifyInstance) {
       return { user, token, refreshToken }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const erro = error.issues[0].message
-        console.error(erro)
-
-        return { erro }
+        const firstError = error.errors[0]
+        reply.status(400).send({ error: firstError.message })
       } else {
-        console.error(error)
+        reply.status(500).send({ error: 'Erro interno do servidor' })
       }
     }
   })
