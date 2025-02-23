@@ -5,22 +5,22 @@ const zod_1 = require("zod");
 const prisma_1 = require("../../lib/prisma");
 async function memoriesRoutesCaxias(app) {
     app.get('/news/caxias', async (request) => {
-        const memories = await prisma_1.prisma.newCaxias.findMany({
+        const offsetQuery = request.query.offset;
+        const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0;
+        const itemsPerPage = 6;
+        const news = await prisma_1.prisma.newCaxias.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+            skip: offset,
+            take: itemsPerPage,
+        });
+        const newsTotal = await prisma_1.prisma.newCaxias.findMany({
             orderBy: {
                 createdAt: 'desc',
             },
         });
-        return memories.map((memory) => {
-            return {
-                id: memory.id,
-                coverUrl: memory.coverUrl,
-                title: memory.title,
-                content: memory.content,
-                excerpt: memory.content.substring(0, 115).concat('...'),
-                createdAt: memory.createdAt,
-                page: memory.page,
-            };
-        });
+        return { news, newsTotal };
     });
     app.get('/news/caxias/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({
@@ -32,9 +32,6 @@ async function memoriesRoutesCaxias(app) {
                 id,
             },
         });
-        if (!memory.isPublic && memory.userId !== request.user.sub) {
-            return reply.status(401).send();
-        }
         return memory;
     });
     app.get('/news/caxias/search', async (request) => {
@@ -51,17 +48,7 @@ async function memoriesRoutesCaxias(app) {
                     OR: [{ title: { contains: search } }],
                 },
             });
-            return memories.map((memory) => {
-                return {
-                    id: memory.id,
-                    coverUrl: memory.coverUrl,
-                    title: memory.title,
-                    content: memory.content,
-                    excerpt: memory.content.substring(0, 115).concat('...'),
-                    createdAt: memory.createdAt,
-                    page: memory.page,
-                };
-            });
+            return memories;
         }
         catch (error) {
             // Trate o erro de maneira apropriada, como retornar um código de erro HTTP 500
@@ -75,9 +62,10 @@ async function memoriesRoutesCaxias(app) {
             coverUrl: zod_1.z.string(),
             title: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
+            destaque: zod_1.z.coerce.boolean().default(false),
             page: zod_1.z.string(),
         });
-        const { content, coverUrl, isPublic, title, page } = bodySchema.parse(request.body);
+        const { content, coverUrl, isPublic, title, page, destaque } = bodySchema.parse(request.body);
         const memory = await prisma_1.prisma.newCaxias.create({
             data: {
                 content,
@@ -86,6 +74,7 @@ async function memoriesRoutesCaxias(app) {
                 isPublic,
                 userId: request.user.sub,
                 page,
+                destaque,
             },
         });
         return memory;
@@ -101,9 +90,10 @@ async function memoriesRoutesCaxias(app) {
             coverUrl: zod_1.z.string(),
             title: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
+            destaque: zod_1.z.coerce.boolean().default(false),
             page: zod_1.z.string(),
         });
-        const { content, coverUrl, isPublic, title, page } = bodySchema.parse(request.body);
+        const { content, coverUrl, isPublic, title, page, destaque } = bodySchema.parse(request.body);
         let memory = await prisma_1.prisma.newCaxias.findUniqueOrThrow({
             where: {
                 id,
@@ -119,6 +109,7 @@ async function memoriesRoutesCaxias(app) {
                 title,
                 isPublic,
                 page,
+                destaque,
             },
         });
         return memory;

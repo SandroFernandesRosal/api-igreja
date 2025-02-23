@@ -10,16 +10,7 @@ async function contatoRoutes(app) {
                 createdAt: 'desc',
             },
         });
-        return contatos.map((contato) => {
-            return {
-                id: contato.id,
-                local: contato.local,
-                whatsapp: contato.whatsapp,
-                instagran: contato.instagran,
-                facebook: contato.facebook,
-                createdAt: contato.createdAt,
-            };
-        });
+        return contatos;
     });
     app.get('/contato/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({
@@ -38,16 +29,16 @@ async function contatoRoutes(app) {
         const bodySchema = zod_1.z.object({
             local: zod_1.z.string(),
             whatsapp: zod_1.z.string(),
-            instagran: zod_1.z.string(),
+            instagram: zod_1.z.string(),
             facebook: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
         });
-        const { local, whatsapp, instagran, isPublic, facebook } = bodySchema.parse(request.body);
+        const { local, whatsapp, instagram, isPublic, facebook } = bodySchema.parse(request.body);
         const contato = await prisma_1.prisma.contato.create({
             data: {
                 local,
                 whatsapp,
-                instagran,
+                instagram,
                 facebook,
                 isPublic,
                 userId: request.user.sub,
@@ -64,11 +55,11 @@ async function contatoRoutes(app) {
         const bodySchema = zod_1.z.object({
             local: zod_1.z.string(),
             whatsapp: zod_1.z.string(),
-            instagran: zod_1.z.string(),
+            instagram: zod_1.z.string(),
             facebook: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
         });
-        const { local, whatsapp, instagran, isPublic, facebook } = bodySchema.parse(request.body);
+        const { local, whatsapp, instagram, isPublic, facebook } = bodySchema.parse(request.body);
         let contato = await prisma_1.prisma.contato.findUniqueOrThrow({
             where: {
                 id,
@@ -81,7 +72,7 @@ async function contatoRoutes(app) {
             data: {
                 local,
                 whatsapp,
-                instagran,
+                instagram,
                 facebook,
                 isPublic,
             },

@@ -5,22 +5,22 @@ const zod_1 = require("zod");
 const prisma_1 = require("../../lib/prisma");
 async function memoriesRoutesTomazinho(app) {
     app.get('/news/tomazinho', async (request) => {
-        const memories = await prisma_1.prisma.newTomazinho.findMany({
+        const offsetQuery = request.query.offset;
+        const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0;
+        const itemsPerPage = 6;
+        const news = await prisma_1.prisma.newTomazinho.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+            skip: offset,
+            take: itemsPerPage,
+        });
+        const newsTotal = await prisma_1.prisma.newTomazinho.findMany({
             orderBy: {
                 createdAt: 'desc',
             },
         });
-        return memories.map((memory) => {
-            return {
-                id: memory.id,
-                coverUrl: memory.coverUrl,
-                title: memory.title,
-                content: memory.content,
-                excerpt: memory.content.substring(0, 115).concat('...'),
-                createdAt: memory.createdAt,
-                page: memory.page,
-            };
-        });
+        return { news, newsTotal };
     });
     app.get('/news/tomazinho/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({
@@ -32,9 +32,6 @@ async function memoriesRoutesTomazinho(app) {
                 id,
             },
         });
-        if (!memory.isPublic && memory.userId !== request.user.sub) {
-            return reply.status(401).send();
-        }
         return memory;
     });
     app.get('/news/tomazinho/search', async (request) => {
@@ -51,20 +48,9 @@ async function memoriesRoutesTomazinho(app) {
                     OR: [{ title: { contains: search } }],
                 },
             });
-            return memories.map((memory) => {
-                return {
-                    id: memory.id,
-                    coverUrl: memory.coverUrl,
-                    title: memory.title,
-                    content: memory.content,
-                    excerpt: memory.content.substring(0, 115).concat('...'),
-                    createdAt: memory.createdAt,
-                    page: memory.page,
-                };
-            });
+            return memories;
         }
         catch (error) {
-            // Trate o erro de maneira apropriada, como retornar um código de erro HTTP 500
             return { error: 'Internal Server Error' };
         }
     });
@@ -75,9 +61,10 @@ async function memoriesRoutesTomazinho(app) {
             coverUrl: zod_1.z.string(),
             title: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
+            destaque: zod_1.z.coerce.boolean().default(false),
             page: zod_1.z.string(),
         });
-        const { content, coverUrl, isPublic, title, page } = bodySchema.parse(request.body);
+        const { content, coverUrl, isPublic, title, page, destaque } = bodySchema.parse(request.body);
         const memory = await prisma_1.prisma.newTomazinho.create({
             data: {
                 content,
@@ -86,6 +73,7 @@ async function memoriesRoutesTomazinho(app) {
                 isPublic,
                 userId: request.user.sub,
                 page,
+                destaque,
             },
         });
         return memory;
@@ -101,9 +89,10 @@ async function memoriesRoutesTomazinho(app) {
             coverUrl: zod_1.z.string(),
             title: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
+            destaque: zod_1.z.coerce.boolean().default(false),
             page: zod_1.z.string(),
         });
-        const { content, coverUrl, isPublic, title, page } = bodySchema.parse(request.body);
+        const { content, coverUrl, isPublic, title, page, destaque } = bodySchema.parse(request.body);
         let memory = await prisma_1.prisma.newTomazinho.findUniqueOrThrow({
             where: {
                 id,
@@ -118,6 +107,7 @@ async function memoriesRoutesTomazinho(app) {
                 coverUrl,
                 title,
                 isPublic,
+                destaque,
                 page,
             },
         });

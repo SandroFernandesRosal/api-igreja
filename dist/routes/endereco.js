@@ -10,15 +10,7 @@ async function enderecoRoutes(app) {
                 createdAt: 'desc',
             },
         });
-        return enderecos.map((endereco) => {
-            return {
-                id: endereco.id,
-                local: endereco.local,
-                rua: endereco.rua,
-                cep: endereco.cep,
-                createdAt: endereco.createdAt,
-            };
-        });
+        return enderecos;
     });
     app.get('/endereco/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({

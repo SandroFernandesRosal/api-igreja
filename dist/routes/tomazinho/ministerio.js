@@ -5,21 +5,22 @@ const zod_1 = require("zod");
 const prisma_1 = require("../../lib/prisma");
 async function ministerioRoutesTomazinho(app) {
     app.get('/ministerio/tomazinho', async (request) => {
-        const ministerios = await prisma_1.prisma.ministerioTomazinho.findMany({
+        const offsetQuery = request.query.offset;
+        const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0;
+        const itemsPerPage = 6;
+        const ministerio = await prisma_1.prisma.ministerioTomazinho.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+            skip: offset,
+            take: itemsPerPage,
+        });
+        const ministerioTotal = await prisma_1.prisma.ministerioTomazinho.findMany({
             orderBy: {
                 createdAt: 'desc',
             },
         });
-        return ministerios.map((ministerio) => {
-            return {
-                id: ministerio.id,
-                name: ministerio.name,
-                title: ministerio.title,
-                local: ministerio.local,
-                createdAt: ministerio.createdAt,
-                coverUrl: ministerio.coverUrl,
-            };
-        });
+        return { ministerio, ministerioTotal };
     });
     app.get('/minsterio/tomazinho/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({
@@ -31,9 +32,6 @@ async function ministerioRoutesTomazinho(app) {
                 id,
             },
         });
-        if (!ministerio.isPublic && ministerio.userId !== request.user.sub) {
-            return reply.status(401).send();
-        }
         return ministerio;
     });
     app.post('/ministerio/tomazinho', async (request) => {

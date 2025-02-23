@@ -5,20 +5,22 @@ const zod_1 = require("zod");
 const prisma_1 = require("../../lib/prisma");
 async function agendaRoutes(app) {
     app.get('/agenda/viladapenha', async (request) => {
-        const agendas = await prisma_1.prisma.agenda.findMany({
+        const offsetQuery = request.query.offset;
+        const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0;
+        const itemsPerPage = 6;
+        const agenda = await prisma_1.prisma.agenda.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+            skip: offset,
+            take: itemsPerPage,
+        });
+        const agendaTotal = await prisma_1.prisma.agenda.findMany({
             orderBy: {
                 createdAt: 'desc',
             },
         });
-        return agendas.map((agenda) => {
-            return {
-                id: agenda.id,
-                name: agenda.name,
-                day: agenda.day,
-                hour: agenda.hour,
-                createdAt: agenda.createdAt,
-            };
-        });
+        return { agenda, agendaTotal };
     });
     app.get('/agenda/viladapenha/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({
@@ -30,9 +32,6 @@ async function agendaRoutes(app) {
                 id,
             },
         });
-        if (!agenda.isPublic && agenda.userId !== request.user.sub) {
-            return reply.status(401).send();
-        }
         return agenda;
     });
     app.post('/agenda/viladapenha', async (request) => {
@@ -42,8 +41,9 @@ async function agendaRoutes(app) {
             day: zod_1.z.string(),
             hour: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
+            destaque: zod_1.z.coerce.boolean().default(false),
         });
-        const { name, day, isPublic, hour } = bodySchema.parse(request.body);
+        const { name, day, isPublic, hour, destaque } = bodySchema.parse(request.body);
         const agenda = await prisma_1.prisma.agenda.create({
             data: {
                 name,
@@ -51,6 +51,7 @@ async function agendaRoutes(app) {
                 hour,
                 isPublic,
                 userId: request.user.sub,
+                destaque,
             },
         });
         return agenda;
@@ -66,8 +67,9 @@ async function agendaRoutes(app) {
             day: zod_1.z.string(),
             hour: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
+            destaque: zod_1.z.coerce.boolean().default(false),
         });
-        const { name, day, isPublic, hour } = bodySchema.parse(request.body);
+        const { name, day, isPublic, hour, destaque } = bodySchema.parse(request.body);
         let agenda = await prisma_1.prisma.agenda.findUniqueOrThrow({
             where: {
                 id,
@@ -82,6 +84,7 @@ async function agendaRoutes(app) {
                 day,
                 hour,
                 isPublic,
+                destaque,
             },
         });
         return agenda;
