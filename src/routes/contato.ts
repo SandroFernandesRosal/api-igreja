@@ -35,12 +35,12 @@ export async function contatoRoutes(app: FastifyInstance) {
     const bodySchema = z.object({
       local: z.string(),
       whatsapp: z.string(),
-      instagran: z.string(),
+      instagram: z.string(),
       facebook: z.string(),
       isPublic: z.coerce.boolean().default(false),
     })
 
-    const { local, whatsapp, instagran, isPublic, facebook } = bodySchema.parse(
+    const { local, whatsapp, instagram, isPublic, facebook } = bodySchema.parse(
       request.body,
     )
 
@@ -48,7 +48,7 @@ export async function contatoRoutes(app: FastifyInstance) {
       data: {
         local,
         whatsapp,
-        instagran,
+        instagram,
         facebook,
         isPublic,
         userId: request.user.sub,
@@ -70,12 +70,12 @@ export async function contatoRoutes(app: FastifyInstance) {
     const bodySchema = z.object({
       local: z.string(),
       whatsapp: z.string(),
-      instagran: z.string(),
+      instagram: z.string(),
       facebook: z.string(),
       isPublic: z.coerce.boolean().default(false),
     })
 
-    const { local, whatsapp, instagran, isPublic, facebook } = bodySchema.parse(
+    const { local, whatsapp, instagram, isPublic, facebook } = bodySchema.parse(
       request.body,
     )
 
@@ -92,7 +92,7 @@ export async function contatoRoutes(app: FastifyInstance) {
       data: {
         local,
         whatsapp,
-        instagran,
+        instagram,
         facebook,
         isPublic,
       },

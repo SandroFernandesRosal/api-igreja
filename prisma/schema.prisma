@@ -201,7 +201,7 @@ model Contato {
   userId    String
   local     String
   whatsapp  String
-  instagran String
+  instagram String
   facebook  String
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
