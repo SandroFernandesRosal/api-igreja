@@ -17,7 +17,7 @@ export async function agendaRoutes(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    return { agenda }
+    return agenda
   })
 
   app.get('/agenda/viladapenha/:id', async (request, reply) => {

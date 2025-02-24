@@ -17,7 +17,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    return { news }
+    return news
   })
 
   app.get('/news/tomazinho/:id', async (request, reply) => {

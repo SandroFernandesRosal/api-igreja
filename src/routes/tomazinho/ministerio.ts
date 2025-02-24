@@ -17,7 +17,7 @@ export async function ministerioRoutesTomazinho(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    return { ministerio }
+    return ministerio
   })
 
   app.get('/minsterio/tomazinho/:id', async (request, reply) => {

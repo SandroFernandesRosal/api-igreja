@@ -17,7 +17,7 @@ export async function agendaRoutesTomazinho(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    return { agenda }
+    return agenda
   })
 
   app.get('/agenda/tomazinho/:id', async (request, reply) => {
