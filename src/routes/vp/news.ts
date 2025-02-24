@@ -7,7 +7,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
     const offsetQuery = (request.query as { offset?: string }).offset
 
     const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
-    const itemsPerPage = 6
+    const itemsPerPage = 12
 
     const news = await prisma.new.findMany({
       orderBy: {
@@ -56,7 +56,6 @@ export async function memoriesRoutes(app: FastifyInstance) {
 
       return memories
     } catch (error) {
-      // Trate o erro de maneira apropriada, como retornar um código de erro HTTP 500
       return { error: 'Internal Server Error' }
     }
   })
