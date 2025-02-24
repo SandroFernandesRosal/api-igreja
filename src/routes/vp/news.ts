@@ -17,13 +17,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    const newsTotal = await prisma.new.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-
-    return { news, newsTotal }
+    return { news }
   })
 
   app.get('/news/viladapenha/:id', async (request, reply) => {

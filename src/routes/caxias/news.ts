@@ -17,13 +17,7 @@ export async function memoriesRoutesCaxias(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    const newsTotal = await prisma.newCaxias.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-
-    return { news, newsTotal }
+    return { news }
   })
 
   app.get('/news/caxias/:id', async (request, reply) => {

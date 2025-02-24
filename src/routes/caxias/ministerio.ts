@@ -17,13 +17,7 @@ export async function ministerioRoutesCaxias(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    const ministerioTotal = await prisma.ministerioCaxias.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-
-    return { ministerio, ministerioTotal }
+    return { ministerio }
   })
 
   app.get('/minsterio/caxias/:id', async (request, reply) => {

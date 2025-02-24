@@ -17,13 +17,7 @@ export async function memoriesRoutesTomazinho(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    const newsTotal = await prisma.newTomazinho.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-
-    return { news, newsTotal }
+    return { news }
   })
 
   app.get('/news/tomazinho/:id', async (request, reply) => {

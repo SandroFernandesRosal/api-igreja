@@ -16,13 +16,8 @@ export async function agendaRoutesTomazinho(app: FastifyInstance) {
       skip: offset,
       take: itemsPerPage,
     })
-    const agendaTotal = await prisma.agendaTomazinho.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
 
-    return { agenda, agendaTotal }
+    return { agenda }
   })
 
   app.get('/agenda/tomazinho/:id', async (request, reply) => {
