@@ -36,16 +36,18 @@ export async function enderecoRoutes(app: FastifyInstance) {
       local: z.string(),
       rua: z.string(),
       cep: z.string(),
+      numero: z.string(),
       isPublic: z.coerce.boolean().default(false),
     })
 
-    const { local, rua, isPublic, cep } = bodySchema.parse(request.body)
+    const { local, rua, isPublic, cep, numero } = bodySchema.parse(request.body)
 
     const endereco = await prisma.endereco.create({
       data: {
         local,
         rua,
         cep,
+        numero,
         isPublic,
         userId: request.user.sub,
       },
@@ -67,10 +69,11 @@ export async function enderecoRoutes(app: FastifyInstance) {
       local: z.string(),
       rua: z.string(),
       cep: z.string(),
+      numero: z.string(),
       isPublic: z.coerce.boolean().default(false),
     })
 
-    const { local, rua, isPublic, cep } = bodySchema.parse(request.body)
+    const { local, rua, isPublic, cep, numero } = bodySchema.parse(request.body)
 
     let endereco = await prisma.endereco.findUniqueOrThrow({
       where: {
@@ -86,6 +89,7 @@ export async function enderecoRoutes(app: FastifyInstance) {
         local,
         rua,
         cep,
+        numero,
         isPublic,
       },
     })
