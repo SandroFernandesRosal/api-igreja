@@ -191,6 +191,7 @@ model Endereco {
   rua       String
   cep       String
   numero    String?
+  cidade    String?
   isPublic  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
