@@ -7,7 +7,7 @@ async function ministerioRoutesCaxias(app) {
     app.get('/ministerio/caxias', async (request) => {
         const offsetQuery = request.query.offset;
         const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0;
-        const itemsPerPage = 6;
+        const itemsPerPage = 12;
         const ministerio = await prisma_1.prisma.ministerioCaxias.findMany({
             orderBy: {
                 createdAt: 'desc',
@@ -15,12 +15,7 @@ async function ministerioRoutesCaxias(app) {
             skip: offset,
             take: itemsPerPage,
         });
-        const ministerioTotal = await prisma_1.prisma.ministerioCaxias.findMany({
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
-        return { ministerio, ministerioTotal };
+        return ministerio;
     });
     app.get('/minsterio/caxias/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({

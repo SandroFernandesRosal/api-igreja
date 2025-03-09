@@ -7,7 +7,7 @@ async function agendaRoutes(app) {
     app.get('/agenda/viladapenha', async (request) => {
         const offsetQuery = request.query.offset;
         const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0;
-        const itemsPerPage = 6;
+        const itemsPerPage = 12;
         const agenda = await prisma_1.prisma.agenda.findMany({
             orderBy: {
                 createdAt: 'desc',
@@ -15,12 +15,7 @@ async function agendaRoutes(app) {
             skip: offset,
             take: itemsPerPage,
         });
-        const agendaTotal = await prisma_1.prisma.agenda.findMany({
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
-        return { agenda, agendaTotal };
+        return agenda;
     });
     app.get('/agenda/viladapenha/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({

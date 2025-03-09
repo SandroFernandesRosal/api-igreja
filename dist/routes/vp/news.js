@@ -7,7 +7,7 @@ async function memoriesRoutes(app) {
     app.get('/news/viladapenha', async (request) => {
         const offsetQuery = request.query.offset;
         const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0;
-        const itemsPerPage = 6;
+        const itemsPerPage = 12;
         const news = await prisma_1.prisma.new.findMany({
             orderBy: {
                 createdAt: 'desc',
@@ -15,12 +15,7 @@ async function memoriesRoutes(app) {
             skip: offset,
             take: itemsPerPage,
         });
-        const newsTotal = await prisma_1.prisma.new.findMany({
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
-        return { news, newsTotal };
+        return news;
     });
     app.get('/news/viladapenha/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({
@@ -51,7 +46,6 @@ async function memoriesRoutes(app) {
             return memories;
         }
         catch (error) {
-            // Trate o erro de maneira apropriada, como retornar um código de erro HTTP 500
             return { error: 'Internal Server Error' };
         }
     });

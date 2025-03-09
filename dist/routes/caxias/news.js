@@ -7,7 +7,7 @@ async function memoriesRoutesCaxias(app) {
     app.get('/news/caxias', async (request) => {
         const offsetQuery = request.query.offset;
         const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0;
-        const itemsPerPage = 6;
+        const itemsPerPage = 1;
         const news = await prisma_1.prisma.newCaxias.findMany({
             orderBy: {
                 createdAt: 'desc',
@@ -15,12 +15,7 @@ async function memoriesRoutesCaxias(app) {
             skip: offset,
             take: itemsPerPage,
         });
-        const newsTotal = await prisma_1.prisma.newCaxias.findMany({
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
-        return { news, newsTotal };
+        return news;
     });
     app.get('/news/caxias/:id', async (request, reply) => {
         const paramsSchema = zod_1.z.object({

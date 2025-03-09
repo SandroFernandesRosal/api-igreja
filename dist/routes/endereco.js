@@ -30,14 +30,16 @@ async function enderecoRoutes(app) {
             local: zod_1.z.string(),
             rua: zod_1.z.string(),
             cep: zod_1.z.string(),
+            numero: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
         });
-        const { local, rua, isPublic, cep } = bodySchema.parse(request.body);
+        const { local, rua, isPublic, cep, numero } = bodySchema.parse(request.body);
         const endereco = await prisma_1.prisma.endereco.create({
             data: {
                 local,
                 rua,
                 cep,
+                numero,
                 isPublic,
                 userId: request.user.sub,
             },
@@ -54,9 +56,10 @@ async function enderecoRoutes(app) {
             local: zod_1.z.string(),
             rua: zod_1.z.string(),
             cep: zod_1.z.string(),
+            numero: zod_1.z.string(),
             isPublic: zod_1.z.coerce.boolean().default(false),
         });
-        const { local, rua, isPublic, cep } = bodySchema.parse(request.body);
+        const { local, rua, isPublic, cep, numero } = bodySchema.parse(request.body);
         let endereco = await prisma_1.prisma.endereco.findUniqueOrThrow({
             where: {
                 id,
@@ -70,6 +73,7 @@ async function enderecoRoutes(app) {
                 local,
                 rua,
                 cep,
+                numero,
                 isPublic,
             },
         });
