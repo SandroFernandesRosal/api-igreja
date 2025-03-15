@@ -71,6 +71,29 @@ export async function testemunhoRoutes(app: FastifyInstance) {
     return testemunho
   })
 
+  app.put('/testemunhos', async (request, reply) => {
+    await request.jwtVerify()
+
+    const bodySchema = z.object({
+      userId: z.string().uuid(),
+      name: z.string(),
+      avatarUrl: z.string(),
+    })
+
+    const { userId, name, avatarUrl } = bodySchema.parse(request.body)
+
+    try {
+      await prisma.testemunho.updateMany({
+        where: { userId },
+        data: { name, avatarUrl },
+      })
+
+      reply.status(200).send('Postagens atualizadas com sucesso')
+    } catch (error) {
+      reply.status(500).send('Erro ao atualizar postagens')
+    }
+  })
+
   app.put('/testemunhos/:id', async (request, reply) => {
     await request.jwtVerify()
 
