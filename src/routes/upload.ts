@@ -44,8 +44,8 @@ export async function uploadRoutes(app: FastifyInstance) {
           format: 'webp',
           transformation: [
             {
-              width: 400,
-              height: 400,
+              width: 1200,
+              height: 500,
               crop: 'pad',
               background: 'auto:border',
             },
