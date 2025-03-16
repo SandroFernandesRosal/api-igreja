@@ -44,10 +44,10 @@ export async function uploadRoutes(app: FastifyInstance) {
           format: 'webp',
           transformation: [
             {
-              width: 1200,
-              height: 600,
+              width: 1200, // Defina uma largura máxima
+              height: 600, // Defina uma altura máxima
               crop: 'pad',
-              background: 'auto:border',
+              background: 'blurred:2000', // Use a própria imagem desfocada como fundo
             },
           ],
         },
