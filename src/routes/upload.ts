@@ -1,24 +1,20 @@
-import { google } from 'googleapis'
+import { v2 as cloudinary } from 'cloudinary'
 import { randomUUID } from 'node:crypto'
 import { extname } from 'node:path'
 import { FastifyInstance } from 'fastify'
-import { GoogleAuth, OAuth2Client } from 'google-auth-library'
-const GOOGLE_API_FOLDER_ID = '1G2Bg5Qs3t5jeB6DM0eZqMUVcwmSaGNzD'
+
+// Configure o Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 export async function uploadRoutes(app: FastifyInstance) {
-  const auth = new GoogleAuth({
-    keyFile: './credentials.json',
-    scopes: ['https://www.googleapis.com/auth/drive'],
-  })
-
-  const client = await auth.getClient()
-
-  const oauth2Client = client as OAuth2Client
-
   app.post('/upload', async (request, reply) => {
     const upload = await request.file({
       limits: {
-        fileSize: 5_242_880, //   5mb
+        fileSize: 5_242_880, // 5mb
       },
     })
 
@@ -37,32 +33,26 @@ export async function uploadRoutes(app: FastifyInstance) {
     const extension = extname(upload.filename)
     const fileName = fileId.concat(extension)
 
-    const drive = google.drive({ version: 'v3', auth: oauth2Client })
+    try {
+      const fileBuffer = await upload.toBuffer()
+      const result = await cloudinary.uploader.upload(
+        `data:${upload.mimetype};base64,${fileBuffer.toString('base64')}`,
+        {
+          resource_type: 'auto',
+          public_id: fileName,
+        },
+      )
 
-    const fileMetadata = {
-      name: fileName,
-      parents: [GOOGLE_API_FOLDER_ID],
+      return { fileUrl: result.secure_url }
+    } catch (error) {
+      return reply.status(500).send(error)
     }
-    const media = {
-      mimeType: upload.mimetype,
-      body: upload.file,
-    }
-    const response = await drive.files.create({
-      requestBody: fileMetadata,
-      media,
-      fields: 'id',
-    })
-
-    // Obtenha a URL do arquivo
-    const fileUrl = `https://drive.google.com/uc?export=view&id=${response.data.id}`
-
-    return { fileUrl }
   })
 
   app.post('/upload/sobre', async (request, reply) => {
     const upload = await request.file({
       limits: {
-        fileSize: 50_000_000, //   50mb
+        fileSize: 50_000_000, // 50mb
       },
     })
 
@@ -81,24 +71,19 @@ export async function uploadRoutes(app: FastifyInstance) {
     const extension = extname(upload.filename)
     const fileName = fileId.concat(extension)
 
-    const drive = google.drive({ version: 'v3', auth: oauth2Client })
+    try {
+      const fileBuffer = await upload.toBuffer()
+      const result = await cloudinary.uploader.upload(
+        `data:${upload.mimetype};base64,${fileBuffer.toString('base64')}`,
+        {
+          resource_type: 'auto',
+          public_id: fileName,
+        },
+      )
 
-    const fileMetadata = {
-      name: fileName,
-      parents: [GOOGLE_API_FOLDER_ID],
+      return { fileUrl: result.secure_url }
+    } catch (error) {
+      return reply.status(500).send(error)
     }
-    const media = {
-      mimeType: upload.mimetype,
-      body: upload.file,
-    }
-    const response = await drive.files.create({
-      requestBody: fileMetadata,
-      media,
-      fields: 'id',
-    })
-
-    const fileUrl = `https://drive.google.com/uc?export=view&id=${response.data.id}`
-
-    return { fileUrl }
   })
 }
