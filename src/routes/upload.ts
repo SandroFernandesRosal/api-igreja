@@ -47,6 +47,7 @@ export async function uploadRoutes(app: FastifyInstance) {
               width: 600,
               height: 600,
               crop: 'pad',
+              background: 'blurred:2000',
             },
           ],
         },
