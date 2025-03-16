@@ -3,7 +3,6 @@ import { randomUUID } from 'node:crypto'
 import { extname } from 'node:path'
 import { FastifyInstance } from 'fastify'
 
-// Configure o Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -43,6 +42,14 @@ export async function uploadRoutes(app: FastifyInstance) {
           resource_type: 'auto',
           public_id: fileName,
           format: 'webp',
+          transformation: [
+            {
+              width: 600,
+              height: 600,
+              crop: 'pad',
+              background: 'blurred:2000',
+            },
+          ],
         },
       )
 
@@ -84,7 +91,15 @@ export async function uploadRoutes(app: FastifyInstance) {
         {
           resource_type: 'auto',
           public_id: fileName,
-          format: 'webp', // Adiciona a transformação para WebP
+          format: 'webp',
+          transformation: [
+            {
+              width: 600,
+              height: 600,
+              crop: 'pad',
+              background: 'blurred:2000',
+            },
+          ],
         },
       )
 
