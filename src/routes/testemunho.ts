@@ -7,7 +7,7 @@ export async function testemunhoRoutes(app: FastifyInstance) {
     const offsetQuery = (request.query as { offset?: string }).offset
 
     const offset = offsetQuery ? parseInt(offsetQuery, 10) : 0
-    const itemsPerPage = 4
+    const itemsPerPage = 12
 
     const testemunho = await prisma.testemunho.findMany({
       orderBy: {
@@ -17,13 +17,7 @@ export async function testemunhoRoutes(app: FastifyInstance) {
       take: itemsPerPage,
     })
 
-    const testemunhoTotal = await prisma.testemunho.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-
-    return { testemunho, testemunhoTotal }
+    return testemunho
   })
 
   app.get('/testemunhos/:id', async (request, reply) => {
