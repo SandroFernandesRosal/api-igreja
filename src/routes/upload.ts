@@ -36,6 +36,7 @@ export async function uploadRoutes(app: FastifyInstance) {
       const fileName = fileId.concat(extension)
 
       const fileBuffer = await upload.toBuffer()
+      console.log('Uploading file to Cloudinary...')
       const result = await cloudinary.uploader.upload(
         `data:${upload.mimetype};base64,${fileBuffer.toString('base64')}`,
         {
@@ -52,11 +53,16 @@ export async function uploadRoutes(app: FastifyInstance) {
           ],
         },
       )
+      console.log('File uploaded successfully:', result)
 
       return { fileUrl: result.secure_url }
     } catch (error) {
       console.error('Error uploading file:', error)
-      return reply.status(500).send({ error: 'Error uploading file' })
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error'
+      return reply
+        .status(500)
+        .send({ error: 'Error uploading file', details: errorMessage })
     }
   })
 
@@ -86,6 +92,7 @@ export async function uploadRoutes(app: FastifyInstance) {
       const fileName = fileId.concat(extension)
 
       const fileBuffer = await upload.toBuffer()
+      console.log('Uploading file to Cloudinary...')
       const result = await cloudinary.uploader.upload(
         `data:${upload.mimetype};base64,${fileBuffer.toString('base64')}`,
         {
@@ -102,11 +109,16 @@ export async function uploadRoutes(app: FastifyInstance) {
           ],
         },
       )
+      console.log('File uploaded successfully:', result)
 
       return { fileUrl: result.secure_url }
     } catch (error) {
       console.error('Error uploading file:', error)
-      return reply.status(500).send({ error: 'Error uploading file' })
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error'
+      return reply
+        .status(500)
+        .send({ error: 'Error uploading file', details: errorMessage })
     }
   })
 }
