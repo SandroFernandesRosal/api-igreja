@@ -42,12 +42,6 @@ export async function uploadRoutes(app: FastifyInstance) {
           resource_type: 'auto',
           public_id: fileName,
           format: 'webp',
-          transformation: [
-            {
-              crop: 'pad',
-              background: 'blurred:1000', // Efeito de desfoque no fundo
-            },
-          ],
         },
       )
 
