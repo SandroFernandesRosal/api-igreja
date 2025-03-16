@@ -36,6 +36,7 @@ app.register(require('@fastify/static'), {
 
 app.register(cors, {
   origin: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 })
 
 app.register(jwt, {
