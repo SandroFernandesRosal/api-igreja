@@ -36,33 +36,19 @@ export async function uploadRoutes(app: FastifyInstance) {
       const fileName = fileId.concat(extension)
 
       const fileBuffer = await upload.toBuffer()
-      console.log('Uploading file to Cloudinary...')
       const result = await cloudinary.uploader.upload(
         `data:${upload.mimetype};base64,${fileBuffer.toString('base64')}`,
         {
           resource_type: 'auto',
           public_id: fileName,
           format: 'webp',
-          transformation: [
-            {
-              width: 600,
-              height: 600,
-              crop: 'pad',
-              background: 'blurred:2000',
-            },
-          ],
         },
       )
-      console.log('File uploaded successfully:', result)
 
       return { fileUrl: result.secure_url }
     } catch (error) {
       console.error('Error uploading file:', error)
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
-      return reply
-        .status(500)
-        .send({ error: 'Error uploading file', details: errorMessage })
+      return reply.status(500).send({ error: 'Error uploading file' })
     }
   })
 
@@ -92,33 +78,19 @@ export async function uploadRoutes(app: FastifyInstance) {
       const fileName = fileId.concat(extension)
 
       const fileBuffer = await upload.toBuffer()
-      console.log('Uploading file to Cloudinary...')
       const result = await cloudinary.uploader.upload(
         `data:${upload.mimetype};base64,${fileBuffer.toString('base64')}`,
         {
           resource_type: 'auto',
           public_id: fileName,
           format: 'webp',
-          transformation: [
-            {
-              width: 600,
-              height: 600,
-              crop: 'pad',
-              background: 'blurred:2000',
-            },
-          ],
         },
       )
-      console.log('File uploaded successfully:', result)
 
       return { fileUrl: result.secure_url }
     } catch (error) {
       console.error('Error uploading file:', error)
-      const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error'
-      return reply
-        .status(500)
-        .send({ error: 'Error uploading file', details: errorMessage })
+      return reply.status(500).send({ error: 'Error uploading file' })
     }
   })
 }
