@@ -1,6 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary'
 import { randomUUID } from 'node:crypto'
 import { extname } from 'node:path'
+
 import { FastifyInstance } from 'fastify'
 
 cloudinary.config({
